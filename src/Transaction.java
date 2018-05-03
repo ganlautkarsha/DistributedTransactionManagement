@@ -1,5 +1,6 @@
 import java.sql.Timestamp;
 import java.util.Comparator;
+import java.util.Date;
 
 public class Transaction {
     private Timestamp timeStamp;
@@ -10,6 +11,10 @@ public class Transaction {
         this.transaction = transaction;
     }
 
+    public Date getDate() {
+        return new Date(this.timeStamp.getTime());
+    }
+
     @Override
     public String toString() {
         return "Transaction{" +
@@ -18,12 +23,13 @@ public class Transaction {
                 '}';
     }
 
+    public static Comparator<Transaction> GetComparator() {
+        return new Comparator<Transaction>() {
+            @Override
+            public int compare(Transaction a, Transaction b) {
+                return Long.compare(a.timeStamp.getTime(), b.timeStamp.getTime());
+            }
+        };
+    }
 
-    public static Comparator<Transaction> TransactionComparator
-            = new Comparator<Transaction>() {
-        @Override
-        public int compare(Transaction a, Transaction b) {
-            return Long.compare(a.timeStamp.getTime(), b.timeStamp.getTime());
-        }
-    };
 }

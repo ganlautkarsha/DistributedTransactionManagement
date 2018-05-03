@@ -9,15 +9,18 @@ import java.util.regex.Pattern;
 
 public class TransactionPreProcessing {
     List transactions;
+    Map<Date, List<Transaction>> transactionGroups;
 
     public TransactionPreProcessing() {
         this.transactions = new ArrayList<>();
+        this.transactionGroups = new HashMap<Date, List<Transaction>>();
     }
 
     public static void main(String[] args) throws IOException {
         TransactionPreProcessing transactionPreProcessing = new TransactionPreProcessing();
         transactionPreProcessing.generateTransactions(transactionPreProcessing);
-        transactionPreProcessing.printTransactions();
+        transactionPreProcessing.groupTransactions();
+        transactionPreProcessing.printGroups();
     }
 
     private void generateTransactions(TransactionPreProcessing transactionPreProcessing) throws IOException {
@@ -35,7 +38,31 @@ public class TransactionPreProcessing {
             String transaction = splitTransaction[1].substring(0, splitTransaction[1].length() - 1);
             this.addTransaction(splitTransaction[0], transaction);
         }
+        Collections.sort(this.transactions, Transaction.GetComparator());
+    }
 
+    private void groupTransactions() {
+        for (Object t : this.transactions) {
+            Transaction transaction = (Transaction) t;
+            Date txnDate = transaction.getDate();
+            List currTxn = this.transactionGroups.get(txnDate);
+            if (currTxn == null) {
+                currTxn = new ArrayList();
+            }
+            currTxn.add(transaction);
+            transactionGroups.put(txnDate, currTxn);
+        }
+    }
+
+    private void printGroups() {
+        for (Date name : transactionGroups.keySet()) {
+
+            String key = name.toString();
+            String value = transactionGroups.get(name).toString();
+            System.out.println(key + " " + value);
+
+
+        }
     }
 
     private void printTransactions() {
