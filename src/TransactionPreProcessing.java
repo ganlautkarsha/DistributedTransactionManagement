@@ -1,11 +1,13 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 
 public class TransactionPreProcessing {
     List transactions;
@@ -21,11 +23,11 @@ public class TransactionPreProcessing {
         transactionPreProcessing.generateTransactions(transactionPreProcessing);
         transactionPreProcessing.groupTransactions();
         transactionPreProcessing.printGroups();
+        transactionPreProcessing.checkPostgresqlVersion();
     }
 
     private void generateTransactions(TransactionPreProcessing transactionPreProcessing) throws IOException {
         String rawTransactions = transactionPreProcessing.parseTransactionFile();
-
 
         String timeRegex = "[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z";
         String patternRegex = timeRegex + ",\"\\s([^\"]*\\s)+\"";
@@ -60,8 +62,6 @@ public class TransactionPreProcessing {
             String key = name.toString();
             String value = transactionGroups.get(name).toString();
             System.out.println(key + " " + value);
-
-
         }
     }
 
@@ -73,7 +73,7 @@ public class TransactionPreProcessing {
     }
 
     String parseTransactionFile() throws IOException {
-        String pathname = "./src/queries/low_concurrency/queries.txt";
+        String pathname = "C:\\Users\\tkul\\Documents\\UC Irvine\\Transaction Processing and Distributed Data Management\\Project\\Submission 1\\Databases\\queries\\low_concurrency\\queries.txt";
         byte[] encoded = Files.readAllBytes(Paths.get(pathname));
         return new String(encoded);
     }
@@ -100,5 +100,70 @@ public class TransactionPreProcessing {
         this.transactions.add(newTransaction);
     }
 
+    public void checkPostgresqlVersion() {
+
+        System.out.println("\n\n\n\n");
+            String url = "jdbc:postgresql:tdm_low_concurrency";
+            String user = "tushar";
+            String password = "Tgkul95%";
+
+            try (Connection con = DriverManager.getConnection(url, user, password);
+                 Statement st = con.createStatement();
+                 ResultSet rs = st.executeQuery("SELECT sen.name \n" +
+                         "FROM SENSOR sen, SENSOR_TYPE st, COVERAGE_INFRASTRUCTURE ci \n" +
+                         "WHERE sen.SENSOR_TYPE_ID=st.id AND st.name='WiFiAP' AND sen.id=ci.SENSOR_ID AND ci.INFRASTRUCTURE_ID=ANY(array['2038','3231','2019','6066','5211','3044','3066','3216','2204','4226'])")) {
+
+                if (rs.next()) {
+                    System.out.println(rs.getString(1));
+                }
+
+            } catch (SQLException ex) {
+                System.out.println(ex);
+            }
+        }
+
+//    private final String url = "jdbc:postgresql://localhost/tdm_low_concurrency";
+//    private final String user = "tushar";
+//    private final String password = "Tgkul95%";
+
+//    public Connection connect() throws SQLException {
+//        String url = "jdbc:postgresql://localhost/test";
+//        Properties props = new Properties();
+//        props.setProperty("user","fred");
+//        props.setProperty("password","secret");
+//        props.setProperty("ssl","true");
+//        Connection conn = DriverManager.getConnection(url, props);
+//        String url = "jdbc:postgresql://localhost/test?user=fred&password=secret&ssl=true";
+//        Connection conn = DriverManager.getConnection(url);
+//        Statement st = conn.createStatement();
+//        ResultSet rs = st.executeQuery("SELECT * FROM mytable WHERE columnfoo = 500");
+//        while (rs.next()) {
+//            System.out.print("Column 1 returned ");
+//            System.out.println(rs.getString(1));
+//        }
+//        rs.close();
+//        st.close();
+//    }
+//
+//    public void psqlCall() {
+//
+//        String SQL = "SELECT sen.name \n" +
+//                "FROM SENSOR sen, SENSOR_TYPE st, COVERAGE_INFRASTRUCTURE ci \n" +
+//                "WHERE sen.SENSOR_TYPE_ID=st.id AND st.name='WiFiAP' AND sen.id=ci.SENSOR_ID AND ci.INFRASTRUCTURE_ID=ANY(array['2038','3231','2019','6066','5211','3044','3066','3216','2204','4226'])";
+//
+//        try (Connection conn = connect();
+//             Statement stmt = conn.createStatement();
+//             ResultSet rs = stmt.executeQuery(SQL)) {
+//            printresults(rs);
+//        } catch (SQLException ex) {
+//            System.out.println(ex.getMessage());
+//        }
+//    }
+//
+//    private void printresults(ResultSet rs) throws SQLException {
+//        while (rs.next()) {
+//            System.out.println(rs.getString("NAME"));
+//        }
 
 }
+
