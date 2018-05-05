@@ -1,5 +1,5 @@
 .idea/*
-tau-transaction-mgmt.iml
+tau-operation-mgmt.iml
 data/*
 queries/*
 schema/*
