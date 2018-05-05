@@ -22,13 +22,18 @@ public class TransactionPreProcessing {
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         TransactionPreProcessing transactionPreProcessing = new TransactionPreProcessing();
-        transactionPreProcessing.generateTransactions(transactionPreProcessing);
-        transactionPreProcessing.groupTransactions();
-        transactionPreProcessing.writeToFiles(transactionPreProcessing, "./src/preprocessedFiles/Queries");
+        transactionPreProcessing.processQueries();
     }
 
-    private void generateTransactions(TransactionPreProcessing transactionPreProcessing) throws IOException {
-        String rawTransactions = transactionPreProcessing.parseOperationFile();
+    private void processQueries() throws IOException {
+        this.generateQueryOperations();
+        this.groupTransactions();
+        this.writeToFiles("./src/preprocessedFiles/Queries");
+
+    }
+
+    private void generateQueryOperations() throws IOException {
+        String rawTransactions = this.parseQueryOperationFile();
 
         String timeRegex = "[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z";
         String patternRegex = timeRegex + ",\"\\s([^\"]*\\s)+\"";
@@ -59,17 +64,17 @@ public class TransactionPreProcessing {
     }
 
 
-    private void writeToFiles(TransactionPreProcessing transactionPreProcessing, String prefix) throws IOException {
+    private void writeToFiles(String prefix) throws IOException {
 
-        for (Object d : transactionPreProcessing.operationGroups.keySet()) {
+        for (Object d : this.operationGroups.keySet()) {
             String date = (String) d;
-            this.readerWriter.writeToFile(transactionPreProcessing.operationGroups, prefix, date);
+            this.readerWriter.writeToFile(this.operationGroups, prefix, date);
 
         }
     }
 
 
-    private String parseOperationFile() throws IOException {
+    private String parseQueryOperationFile() throws IOException {
         String pathname = "./src/queries/low_concurrency/queries.txt";
         byte[] encoded = Files.readAllBytes(Paths.get(pathname));
         return new String(encoded);
