@@ -1,15 +1,18 @@
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
 
-public class Operation {
+public class Operation implements Serializable {
+    private static final long serialVersionUID = 1L;
     private Timestamp timeStamp;
     private String operation;
     private StatementPriority operationPriority;
 
     public Operation(Timestamp timeStamp, String operation, StatementPriority operationPriority) {
+
         this.timeStamp = timeStamp;
         this.operation = operation;
         this.operationPriority = operationPriority;

@@ -1,6 +1,4 @@
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.*;
@@ -14,19 +12,19 @@ import java.util.regex.Pattern;
 public class TransactionPreProcessing {
     List operations;
     Map<String, List<Operation>> operationGroups;
+    ReaderWriter readerWriter;
 
     public TransactionPreProcessing() {
         this.operations = new ArrayList<>();
         this.operationGroups = new HashMap<String, List<Operation>>();
+        this.readerWriter = new ReaderWriter();
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, ClassNotFoundException {
         TransactionPreProcessing transactionPreProcessing = new TransactionPreProcessing();
         transactionPreProcessing.generateTransactions(transactionPreProcessing);
         transactionPreProcessing.groupTransactions();
-        //transactionPreProcessing.printGroups();
-        transactionPreProcessing.writeToFiles("./src/preprocessedFiles/Queries");
-        //transactionPreProcessing.postgreSQLCall();
+        transactionPreProcessing.writeToFiles(transactionPreProcessing, "./src/preprocessedFiles/Queries");
     }
 
     private void generateTransactions(TransactionPreProcessing transactionPreProcessing) throws IOException {
@@ -61,17 +59,15 @@ public class TransactionPreProcessing {
     }
 
 
-    private void writeToFiles(String prefix) throws IOException {
-        for (Object date : this.operationGroups.keySet()) {
-            String d = (String) date;
-            String currDate = d;
-            File file = new File(prefix + currDate + ".txt");
-            FileWriter writer = new FileWriter(file);
-            writer.write(String.valueOf(operationGroups.get(currDate)));
-            writer.close();
+    private void writeToFiles(TransactionPreProcessing transactionPreProcessing, String prefix) throws IOException {
+
+        for (Object d : transactionPreProcessing.operationGroups.keySet()) {
+            String date = (String) d;
+            this.readerWriter.writeToFile(transactionPreProcessing.operationGroups, prefix, date);
 
         }
     }
+
 
     private String parseOperationFile() throws IOException {
         String pathname = "./src/queries/low_concurrency/queries.txt";
