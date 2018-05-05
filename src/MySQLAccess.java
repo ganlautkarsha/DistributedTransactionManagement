@@ -31,17 +31,9 @@ public class MySQLAccess {
 
     private void close() {
         try {
-            if (resultSet != null) {
-                resultSet.close();
-            }
-
-            if (statement != null) {
-                statement.close();
-            }
-
-            if (connect != null) {
-                connect.close();
-            }
+            if (resultSet != null) resultSet.close();
+            if (statement != null) statement.close();
+            if (connect != null) connect.close();
         } catch (Exception e) {
 
         }
