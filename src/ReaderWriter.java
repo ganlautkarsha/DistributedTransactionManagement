@@ -1,13 +1,16 @@
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class ReaderWriter {
-    public void writeToFile(Map operationGroup, String prefix, String date) throws IOException {
-        FileOutputStream f = new FileOutputStream(new File(prefix + date + ".txt"));
+    public void writeToFile(List operations, String prefix, String date) throws IOException {
+        File file = new File(prefix + date + ".txt");
+        if (file.exists()) {
+            System.out.println("I exist!");
+        }
+        FileOutputStream f = new FileOutputStream(file);
+
         ObjectOutputStream o = new ObjectOutputStream(f);
-        List operations = (List) operationGroup.get(date);
         for (Object ob : operations) {
             Operation op = (Operation) ob;
             o.writeObject(op);

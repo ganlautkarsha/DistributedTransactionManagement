@@ -4,3 +4,4 @@ data/*
 queries/*
 schema/*
 out
+*.iml
