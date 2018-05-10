@@ -5,3 +5,5 @@ queries/*
 schema/*
 out
 *.iml
+src/data/*
+src/queries/*
