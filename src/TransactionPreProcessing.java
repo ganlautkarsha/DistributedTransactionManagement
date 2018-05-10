@@ -14,29 +14,61 @@ public class TransactionPreProcessing {
     List operations;
     List obeservationOperations;            //contains obervation operations
     Map<String, List<Operation>> operationGroups;   //contains queries as a map (date, operations on that day)
+    TreeMap<String,List<String>> allOperations;
 
     public TransactionPreProcessing() {
         this.operations = new ArrayList<>();
         this.obeservationOperations = new ArrayList<>();
         this.operationGroups = new HashMap<String, List<Operation>>();
+        this.allOperations=new TreeMap<>();
+        
     }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
+        Files.deleteIfExists(Paths.get("output.txt"));
         TransactionPreProcessing transactionPreProcessing = new TransactionPreProcessing();
         transactionPreProcessing.processQueries();
-        transactionPreProcessing.parseObservationOperationFile();
+        transactionPreProcessing.parseObservationOperationFile("./src/data/high_concurrency/observation_high_concurrency.sql");
+        transactionPreProcessing.parseObservationOperationFile("./src/data/high_concurrency/semantic_observation_high_concurrency.sql");
+        transactionPreProcessing.saveToFile();
+
     }
 
     private void processQueries() throws IOException {
         this.generateQueryOperations();
-        this.groupTransactions();
+//        this.groupTransactions();
+        //parses semantic observation
         //writing to db logic here
+    }
+
+    private void saveToFile() throws IOException {
+
+        System.out.println("Size:"+this.allOperations.size());
+//        try (BufferedWriter writer = new BufferedWriter((new FileWriter("output.txt", true)))) {
+//            for(Map.Entry<String, List<String>> entry : this.allOperations.entrySet()) {
+//                String key = entry.getKey();
+//
+//                for(String val:entry.getValue())
+//                {
+//                    writer.append(key+","+val+"\n");
+//                }
+//            }
+//        }
+//        catch (IOException e)
+//        {
+//            e.printStackTrace();
+//        }
+        FileOutputStream fileOutputStream = new FileOutputStream("output");
+        ObjectOutputStream objectOutputStream= new ObjectOutputStream(fileOutputStream);
+
+        objectOutputStream.writeObject(allOperations);
+        objectOutputStream.close();
     }
 
 
     //use same for semantic file
-    private void parseObservationOperationFile() throws IOException {
-        String pathName = "./src/data/low_concurrency/observation_low_concurrency.sql";
+    private void parseObservationOperationFile(String op) throws IOException {
+        String pathName = op;
         int count = 0;
 
         try (BufferedReader br = Files.newBufferedReader(Paths.get(pathName), StandardCharsets.UTF_8)) {
@@ -70,6 +102,9 @@ public class TransactionPreProcessing {
                 "yyyy-MM-dd HH:mm:ss", Locale.US);
         Operation newOperation = parseToOperation(date, rawObservation, this.obeservationOperations, dateFormat);
         this.obeservationOperations.add(newOperation);
+        List<String> curlist=this.allOperations.getOrDefault(newOperation.getDate(), new ArrayList<>());
+        curlist.add(newOperation.getOperation());
+        this.allOperations.put(newOperation.getDate(),curlist);
         return newOperation.getDate();
     }
 
@@ -83,14 +118,19 @@ public class TransactionPreProcessing {
         Matcher matcher = pattern.matcher(rawTransactions);
         SimpleDateFormat dateFormat = new SimpleDateFormat(
                 "yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
-
+        int count=0;
         while (matcher.find()) {     // find the next match
             String rawTransaction = matcher.group();
             String[] splitTransaction = rawTransaction.split(",\"");
             String transaction = splitTransaction[1].substring(0, splitTransaction[1].length() - 1);
+            transaction = transaction.replace("\n"," ");
             Operation newOperation = this.parseToOperation(splitTransaction[0], transaction, this.operations, dateFormat);
             this.operations.add(newOperation);
-
+            List<String> curlist=this.allOperations.getOrDefault(newOperation.getDate(), new ArrayList<String>());
+            curlist.add(newOperation.getOperation());
+            this.allOperations.put(newOperation.getDate(),curlist);
+            System.out.println(count);
+            count++;
         }
         Collections.sort(this.operations, Operation.GetComparator());
     }
@@ -111,7 +151,7 @@ public class TransactionPreProcessing {
 
 
     private String parseQueryOperationFile() throws IOException {
-        String pathname = "./src/queries/low_concurrency/queries.txt";
+        String pathname = "./src/queries/high_concurrency/queries.txt";
         byte[] encoded = Files.readAllBytes(Paths.get(pathname));
         return new String(encoded);
     }

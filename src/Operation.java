@@ -1,9 +1,6 @@
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Comparator;
-import java.util.Date;
 
 public class Operation implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -19,19 +16,25 @@ public class Operation implements Serializable {
     }
 
     public String getDate() {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Date date = new Date(this.timeStamp.getTime());
-        return dateFormat.format(date);
+//        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+//        Date date = new Date(this.timeStamp.getTime());
+//        return dateFormat.format(date);
+        return this.timeStamp.toString();
     }
 
-    @Override
-    public String toString() {
-        return "Operation{" +
-                "timeStamp=" + timeStamp +
-                ", operation='" + operation + '\'' +
-                ", operationPriority=" + operationPriority +
-                '}';
+    public String getOperation()
+    {
+        return operation;
     }
+
+//    @Override
+//    public String toString() {
+//        return "Operation{" +
+//                "timeStamp=" + timeStamp +
+//                ", operation='" + operation + '\'' +
+//                ", operationPriority=" + operationPriority +
+//                '}';
+//    }
 
     public static Comparator<Operation> GetComparator() {
         return new Comparator<Operation>() {
