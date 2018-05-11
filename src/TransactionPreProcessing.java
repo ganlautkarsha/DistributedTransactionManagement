@@ -16,20 +16,21 @@ public class TransactionPreProcessing {
     Map<String, List<Operation>> operationGroups;   //contains queries as a map (date, operations on that day)
     TreeMap<String,List<String>> allOperations;
 
+    String outFile = "output.ser";
+
     public TransactionPreProcessing() {
         this.operations = new ArrayList<>();
         this.obeservationOperations = new ArrayList<>();
         this.operationGroups = new HashMap<String, List<Operation>>();
         this.allOperations=new TreeMap<>();
-        
     }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
-        Files.deleteIfExists(Paths.get("output.txt"));
+//        Files.deleteIfExists(Paths.get("TreeMap_low_concurrency.ser"));
         TransactionPreProcessing transactionPreProcessing = new TransactionPreProcessing();
         transactionPreProcessing.processQueries();
-        transactionPreProcessing.parseObservationOperationFile("./src/data/high_concurrency/observation_high_concurrency.sql");
-        transactionPreProcessing.parseObservationOperationFile("./src/data/high_concurrency/semantic_observation_high_concurrency.sql");
+//        transactionPreProcessing.parseObservationOperationFile("./src/data/low_concurrency/observation_low_concurrency.sql");
+//        transactionPreProcessing.parseObservationOperationFile("./src/data/low_concurrency/semantic_observation_low_concurrency.sql");
         transactionPreProcessing.saveToFile();
 
     }
@@ -42,57 +43,26 @@ public class TransactionPreProcessing {
     }
 
     private void saveToFile() throws IOException {
+        ReaderWriter writer = new ReaderWriter();
+//        writer.writeToFile(this.allOperations);
 
-//        System.out.println("Size:"+this.allOperations.size());
-//        try (BufferedWriter writer = new BufferedWriter((new FileWriter("output.txt", true)))) {
-//            for(Map.Entry<String, List<String>> entry : this.allOperations.entrySet()) {
-//                String key = entry.getKey();
-//
-//                for(String val:entry.getValue())
-//                {
-//                    writer.append(key+","+val+"\n");
-//                }
-//            }
-//        }
-//        catch (IOException e)
-//        {
-//            e.printStackTrace();
-//        }
-        try {
-            FileOutputStream fileOut = new FileOutputStream("TreeMap.ser");
-            ObjectOutputStream out = new ObjectOutputStream(fileOut);
-            out.writeObject(allOperations);
-            out.close();
-            fileOut.close();
-            System.out.printf("Serialized data is saved in TreeMap.ser");
-        } catch (IOException i) {
-            i.printStackTrace();
+        System.out.println("Size:"+this.allOperations.size());
+        try{
+            for(Map.Entry<String, List<String>> entry : this.allOperations.entrySet()) {
+                String key = entry.getKey();
+                writer.writeToFile(entry.getValue());
+            }
+            System.out.println("Done");
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
         }
 
-//        ---- For reading TreeMap.ser ----
-//        TreeMap<String,List<String>> allOperations;
-//        try {
-//            FileInputStream fileIn = new FileInputStream("TreeMap.ser");
-//            ObjectInputStream in = new ObjectInputStream(fileIn);
-//            allOperations = (Employee) in.readObject();
-//            in.close();
-//            fileIn.close();
-//        } catch (IOException i) {
-//            i.printStackTrace();
-//            return;
-//        } catch (ClassNotFoundException c) {
-//            System.out.println("Employee class not found");
-//            c.printStackTrace();
-//            return;
-//        }
-//
-//        System.out.println("Deserialized Employee...");
-//        System.out.println("Name: " + e.name);
-//        System.out.println("Address: " + e.address);
-//        System.out.println("SSN: " + e.SSN);
-//        System.out.println("Number: " + e.number);
-//    }
-}
+
+
+
+    }
 
 
     //use same for semantic file
@@ -180,7 +150,7 @@ public class TransactionPreProcessing {
 
 
     private String parseQueryOperationFile() throws IOException {
-        String pathname = "./src/queries/high_concurrency/queries.txt";
+        String pathname = "./src/queries/low_concurrency/queries.txt";
         byte[] encoded = Files.readAllBytes(Paths.get(pathname));
         return new String(encoded);
     }
