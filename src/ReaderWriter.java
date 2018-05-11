@@ -7,12 +7,16 @@ public class ReaderWriter {
     FileOutputStream fileOut;
     ObjectOutputStream out;
     ObjectInputStream oi;
-    ReaderWriter()
+    ReaderWriter(String role)
     {
         try
         {
-            fileOut = new FileOutputStream("TreeMap_test.txt");
-            out = new ObjectOutputStream(fileOut);
+        	if(role.equals("writer"))
+        	{
+        		fileOut = new FileOutputStream("TreeMap_test.txt");
+        		out = new ObjectOutputStream(fileOut);
+        	}
+            
         }
         catch(IOException e)
         {
@@ -38,7 +42,7 @@ public class ReaderWriter {
         try {
 
             for(Object ob:operations)
-                out.writeObject(operations);
+                out.writeObject(ob);
 
 //            System.out.printf("Serialized data is saved in TreeMap_low_concurrency.ser");
         } catch (IOException i) {

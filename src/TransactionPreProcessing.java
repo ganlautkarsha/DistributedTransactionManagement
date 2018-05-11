@@ -43,7 +43,7 @@ public class TransactionPreProcessing {
     }
 
     private void saveToFile() throws IOException {
-        ReaderWriter writer = new ReaderWriter();
+        ReaderWriter writer = new ReaderWriter("writer");
 //        writer.writeToFile(this.allOperations);
 
         System.out.println("Size:"+this.allOperations.size());
@@ -58,10 +58,6 @@ public class TransactionPreProcessing {
         {
             e.printStackTrace();
         }
-
-
-
-
     }
 
 
