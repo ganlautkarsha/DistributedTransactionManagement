@@ -72,7 +72,7 @@ public class TransactionPreProcessing {
 //        ---- For reading TreeMap.ser ----
 //        TreeMap<String,List<String>> allOperations;
 //        try {
-//            FileInputStream fileIn = new FileInputStream("/tmp/employee.ser");
+//            FileInputStream fileIn = new FileInputStream("TreeMap.ser");
 //            ObjectInputStream in = new ObjectInputStream(fileIn);
 //            allOperations = (Employee) in.readObject();
 //            in.close();
