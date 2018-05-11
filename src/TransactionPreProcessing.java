@@ -37,13 +37,13 @@ public class TransactionPreProcessing {
     private void processQueries() throws IOException {
         this.generateQueryOperations();
 //        this.groupTransactions();
-        //parses semantic observation
-        //writing to db logic here
+//        parses semantic observation
+//        writing to db logic here
     }
 
     private void saveToFile() throws IOException {
 
-        System.out.println("Size:"+this.allOperations.size());
+//        System.out.println("Size:"+this.allOperations.size());
 //        try (BufferedWriter writer = new BufferedWriter((new FileWriter("output.txt", true)))) {
 //            for(Map.Entry<String, List<String>> entry : this.allOperations.entrySet()) {
 //                String key = entry.getKey();
@@ -58,11 +58,17 @@ public class TransactionPreProcessing {
 //        {
 //            e.printStackTrace();
 //        }
-        FileOutputStream fileOutputStream = new FileOutputStream("output");
-        ObjectOutputStream objectOutputStream= new ObjectOutputStream(fileOutputStream);
+        try {
+            FileOutputStream fileOut = new FileOutputStream("TreeMap.ser");
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            out.writeObject(allOperations);
+            out.close();
+            fileOut.close();
+            System.out.printf("Serialized data is saved in TreeMap.ser");
+        } catch (IOException i) {
+            i.printStackTrace();
+        }
 
-        objectOutputStream.writeObject(allOperations);
-        objectOutputStream.close();
     }
 
 
