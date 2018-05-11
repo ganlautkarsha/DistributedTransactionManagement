@@ -91,9 +91,7 @@ public class TransactionPreProcessing {
 //        System.out.println("Address: " + e.address);
 //        System.out.println("SSN: " + e.SSN);
 //        System.out.println("Number: " + e.number);
-    }
-
-
+//    }
 }
 
 
