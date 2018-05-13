@@ -34,6 +34,7 @@ public class ReaderWriter {
     public void finalize()
     {
         try {
+        	System.out.println("Closing file");
             out.close();
             fileOut.close();
         }
@@ -43,6 +44,19 @@ public class ReaderWriter {
         }
     }
 
+    public void closeFile()
+    {
+    	try {
+        	System.out.println("Closing file");
+            out.close();
+            fileOut.close();
+        }
+        catch (IOException e)
+        {
+
+        }
+    	
+    }
 
     public void writeToFile(ArrayList<String> operations)
     {
@@ -54,6 +68,7 @@ public class ReaderWriter {
             	check_cnt++;
                 out.writeObject(ob);
             }
+            out.flush();
             optimestamp++;
 
             System.out.println("written-->"+check_cnt);
@@ -63,16 +78,17 @@ public class ReaderWriter {
     }
 
     public void readFromFile(String path) throws IOException, ClassNotFoundException {
+    	System.out.println(path);
         FileInputStream fi = new FileInputStream(new File(path));
         ObjectInputStream oi = new ObjectInputStream(fi);
-        List operations = new ArrayList<String>();
+        List<String> operations = new ArrayList<String>();
         boolean cont = true;
         while (cont) {
             try {
                 Object object = oi.readObject();
-                System.out.println(object.toString());
+//                System.out.println(object.toString());
                 if (object != null) {
-                    operations.add(object);
+                    operations.add(object.toString());
                 } else {
                     cont = false;
                 }
@@ -82,7 +98,7 @@ public class ReaderWriter {
             }
         }
         System.out.println("READ:::::"+operations.size());
-
+        oi.close();
     }
 
 //    public void readFromFile(String path) throws IOException, ClassNotFoundException {

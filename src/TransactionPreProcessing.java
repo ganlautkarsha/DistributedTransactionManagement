@@ -83,6 +83,7 @@ public class TransactionPreProcessing {
 //		writer.writeToFile(listop);
 		System.out.println("Done"+c);
 		System.out.println("Total="+cnt);
+		writer.closeFile();
     }
 
 

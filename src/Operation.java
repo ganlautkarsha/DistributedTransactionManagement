@@ -17,6 +17,11 @@ public class Operation implements Serializable {
         this.operation = operation;
         this.operationPriority = operationPriority;
     }
+    public Operation(String timeStamp, List<String> operation) {
+
+    	this.timeStamp=Timestamp.valueOf(timeStamp);
+        this.operation = (ArrayList<String>) operation;
+    }
     public List<String> getOperationList()
     {
     	return this.operation;
