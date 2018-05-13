@@ -146,7 +146,8 @@ public class TransactionPreProcessing {
 
 
     private String parseQueryOperationFile() throws IOException {
-        String pathname = "./src/queries/low_concurrency/queries.txt";
+        //Remove "-sql"
+        String pathname = "./src/queries/low_concurrency/queries-sql.txt";
         byte[] encoded = Files.readAllBytes(Paths.get(pathname));
         return new String(encoded);
     }
