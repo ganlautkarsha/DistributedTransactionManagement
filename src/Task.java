@@ -3,17 +3,19 @@ import java.util.ArrayList;
 
 public class Task implements Runnable
 {
-    private final ArrayList<String> listOfOperations;
+    private ArrayList<String> listOfOperations;
     private Connection connect = null;
     private Statement statement = null;
     private ResultSet resultSet = null;
     
 
     public Task(ArrayList<String> listOfOperations) {
-        this.listOfOperations = listOfOperations;
+        this.listOfOperations = new ArrayList<>(listOfOperations);
+        System.out.println("Size of listOfOperations in Constructor: " + this.listOfOperations.size());
     }
 
     private void postgreSQLConnction () {
+        System.out.println("In PostgreSQLConnection");
         String url = "jdbc:postgresql://localhost/tdm_multithreading_test";
         String user = "tushar";
         String password = "tush0906";
@@ -25,17 +27,20 @@ public class Task implements Runnable
             
 //          *****Executing*****
 //            String op: this.listOfOperations
+            System.out.println("listOfOperations = " + this.listOfOperations.size());
             for(int i = 0; i < listOfOperations.size(); i++) {
                 String op = listOfOperations.get(i);
                 String operation = op.replace("\n", "").trim();
                 if(operation.startsWith("SELECT"))
                 {
+                    System.out.println("SELECT Present");
                     resultSet = statement.executeQuery(operation);
                     if (resultSet.next()) {
                         System.out.println("SQL Query Result:  " + resultSet.getString(1));
                     }
                 }
                 else {
+                    System.out.println("INSERT Present");
                     statement.executeUpdate(operation);
                 }
             }
@@ -43,6 +48,7 @@ public class Task implements Runnable
             e.printStackTrace();
         } finally {
             close();
+            System.out.println("Close Connection");
         }
     }
 
@@ -58,6 +64,7 @@ public class Task implements Runnable
 
     @Override
     public void run() {
+        System.out.println("Running Thread");
         postgreSQLConnction();
     }
 }

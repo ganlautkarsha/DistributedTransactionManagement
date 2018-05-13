@@ -124,7 +124,7 @@ public class ReaderWriter {
         check_cnt++;
         if (object != null) {
         	Operation op=(Operation) object;
-//        	queue.add(op.getOperationList());
+//        	threadQueue.add(op.getOperationList());
         	
 //            operations.add(object);
 //            count++;
@@ -134,8 +134,8 @@ public class ReaderWriter {
     }
 
     public ArrayList<String> getNext(ArrayList<String> operations) {
-    	
-    	
+
+
 //    	operations.clear();
 //        int count = 0;
 //        try {
@@ -153,6 +153,7 @@ public class ReaderWriter {
 //
 //        }
         System.out.println("Current check count="+check_cnt+"returning size="+operations.size());
+        operations=(ArrayList)TransactionManager.operationMap.remove(0);
         return operations;
     }
 
