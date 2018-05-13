@@ -99,7 +99,7 @@ public class TransactionManager {
 			int threadcount=0;
 			ArrayList<ArrayList<String>> queue=new ArrayList<>();
 			ArrayList<String> listoperations=new ArrayList<>();
-			readerObj.readFromFile("TreeMap_test.txt");
+			readerObj.readFromFile("TreeMap_test.ser");
 			int count=0;
 			Timestamp start_timestamp = new Timestamp(System.currentTimeMillis());
 			boolean flag=true;

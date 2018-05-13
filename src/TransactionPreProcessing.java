@@ -68,16 +68,19 @@ public class TransactionPreProcessing {
 		    {
 		    	System.out.println("prev="+prev.toString());
 		    	System.out.println("Group created");
-		    	Operation op=new Operation(Timestamp.valueOf(opKey), opGroup,StatementPriority.HIGH);
+//		    	Operation op=new Operation(Timestamp.valueOf(opKey), opGroup,StatementPriority.HIGH);
+		    	writer.writeToFile(opGroup);
+//		    	listop.add(op);
+		    	
 		    	c+=opGroup.size();
 		    	opGroup.clear();
 		    	opGroup.addAll(opEntry.getValue());
-                listop.add(op);
+                
 		    }
 		    prev=current;
 		}
 		System.out.println("size of listop"+listop.size());
-		writer.writeToFile(listop);
+//		writer.writeToFile(listop);
 		System.out.println("Done"+c);
 		System.out.println("Total="+cnt);
     }
@@ -146,7 +149,8 @@ public class TransactionPreProcessing {
             List<String> curlist=this.allOperations.getOrDefault(newOperation.getDate(), new ArrayList<String>());
             curlist.add(newOperation.getOperation());
             this.allOperations.put(newOperation.getDate(),curlist);
-            System.out.println(count);
+            System.out.println("-->"+count);
+            System.out.println("Allop size="+this.allOperations.size());
             count++;
         }
         Collections.sort(this.operations, Operation.GetComparator());

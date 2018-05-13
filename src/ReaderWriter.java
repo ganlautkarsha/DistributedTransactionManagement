@@ -2,20 +2,24 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.w3c.dom.ls.LSInput;
+
 public class ReaderWriter {
 	int BLOCKSIZE=100;
 	int check_cnt=0;
     FileOutputStream fileOut;
     ObjectOutputStream out;
+    int optimestamp=1;
     ObjectInputStream oi;
-    List<String> queue=new ArrayList<>();
+    List<List<String>> queue=new ArrayList<>();
     ReaderWriter(String role)
     {
         try
         {
         	if(role.equals("writer"))
         	{
-        		fileOut = new FileOutputStream("TreeMap_test.txt");
+        		
+        		fileOut = new FileOutputStream("TreeMap_test.ser");
         		out = new ObjectOutputStream(fileOut);
         	}
             
@@ -40,102 +44,109 @@ public class ReaderWriter {
     }
 
 
-    public void writeToFile(List<Operation> operations)
+    public void writeToFile(ArrayList<String> operations)
     {
         try {
 
-        	int c=0;
-        	out.writeObject(operations);
-//            for(Object ob:operations)
-//            {
-//            	c++;
-//                out.writeObject(ob);
-//            }
+        	out.writeObject("t"+optimestamp);
+            for(Object ob:operations)
+            {
+            	check_cnt++;
+                out.writeObject(ob);
+            }
+            optimestamp++;
 
-            System.out.println("written-->"+c);
-//            System.out.printf("Serialized data is saved in TreeMap_low_concurrency.ser");
+            System.out.println("written-->"+check_cnt);
         } catch (IOException i) {
             i.printStackTrace();
         }
     }
 
-//    public void readFromFile(String path) throws IOException, ClassNotFoundException {
-//        FileInputStream fi = new FileInputStream(new File(path));
-//        ObjectInputStream oi = new ObjectInputStream(fi);
-//        List operations = new ArrayList<Operation>();
-//        boolean cont = true;
-//        while (cont) {
-//            try {
-//                Object object = oi.readObject();
-//                if (object != null) {
-//                    operations.add(object);
-//                } else {
-//                    cont = false;
-//                }
-//            } catch (Exception e) {
-//                cont = false;
-//            }
-//        }
-//
-//    }
-
     public void readFromFile(String path) throws IOException, ClassNotFoundException {
-
         FileInputStream fi = new FileInputStream(new File(path));
-        oi = new ObjectInputStream(fi);
-
-        List<Operation> listop=new ArrayList<Operation>();
-    	boolean cont = true;
-    	int count=0;
-        try {
-        	while(cont)
-        	{
-	            Object opObject = oi.readObject();
-	            if (opObject != null) {
-	            	System.out.println(opObject);
-	            	Operation op=(Operation) opObject;
-	            	listop.add(op);
-	                count+=op.getOperationList().size();
-	            }
-	            else
-	            {
-	            	cont=false;
-	            }
-        	}
-        } 
-        catch(EOFException e)
-        {
-//        	e.printStackTrace();
-        }	
-        	catch (Exception e) {
-        
-            cont = false;
-            e.printStackTrace();
+        ObjectInputStream oi = new ObjectInputStream(fi);
+        List operations = new ArrayList<String>();
+        boolean cont = true;
+        while (cont) {
+            try {
+                Object object = oi.readObject();
+                System.out.println(object.toString());
+                if (object != null) {
+                    operations.add(object);
+                } else {
+                    cont = false;
+                }
+            } catch (Exception e) {
+                cont = false;
+                e.printStackTrace();
+            }
         }
-        System.out.println("Size=-====== "+count+" size of list= "+listop.size());
-//        return operations;
-        
-        
-        
-        
-        
-        //        ---- For reading TreeMap.ser ----
-
-//        TreeMap<String,List<String>> allOperations_new=new TreeMap<>();
-//        try {
-//            FileInputStream fileIn = new FileInputStream("TreeMap_low_concurrency.ser");
-//            ObjectInputStream in = new ObjectInputStream(fileIn);
-//            allOperations_new = (TreeMap<String, List<String>>) in.readObject();
-//            in.close();
-//            fileIn.close();
-//        } catch (IOException i) {
-//            i.printStackTrace();
-//        } catch (ClassNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//        return  allOperations_new;
+        System.out.println("READ:::::"+operations.size());
 
     }
+
+//    public void readFromFile(String path) throws IOException, ClassNotFoundException {
+//
+//        FileInputStream fi = new FileInputStream(new File(path));
+//        oi = new ObjectInputStream(fi);
+//        List<String> listop=new ArrayList<String>();
+//    	boolean cont = true;
+//        try {
+//        	while(cont)
+//        	{
+//	            Object opObject = oi.readObject();
+//	            if (opObject != null) {
+//	            	check_cnt++;
+//	            	if(opObject.toString().length()==2)
+//	            	{
+//	            		if(listop.size()>0)
+//		            	{
+//		            		queue.add(listop);
+//		            		listop.clear();
+//		            	}
+//	            		
+//	            	}
+//	            	listop.add(opObject.toString());
+//	            }
+//	            else
+//	            {
+//	            	cont=false;
+//	            }
+//        	}
+//        	queue.add(listop);
+//        } 
+//        catch(EOFException e)
+//        {
+////        	e.printStackTrace();
+//        }	
+//        	catch (Exception e) {
+//        
+//            cont = false;
+//            e.printStackTrace();
+//        }
+//        System.out.println("Size======= "+check_cnt);
+//        
+//        
+//        
+//        
+//        
+//        //        ---- For reading TreeMap.ser ----
+//
+////        TreeMap<String,List<String>> allOperations_new=new TreeMap<>();
+////        try {
+////            FileInputStream fileIn = new FileInputStream("TreeMap_low_concurrency.ser");
+////            ObjectInputStream in = new ObjectInputStream(fileIn);
+////            allOperations_new = (TreeMap<String, List<String>>) in.readObject();
+////            in.close();
+////            fileIn.close();
+////        } catch (IOException i) {
+////            i.printStackTrace();
+////        } catch (ClassNotFoundException e) {
+////            e.printStackTrace();
+////        }
+////        return  allOperations_new;
+//
+//    }
 
     public void triggerInput() throws ClassNotFoundException, IOException
     {
