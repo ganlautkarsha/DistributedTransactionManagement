@@ -1,10 +1,11 @@
-import java.io.FileNotFoundException;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.lang.invoke.SerializedLambda;
+import java.io.ObjectInputStream;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Timer;
+import java.util.List;
 import java.util.TimerTask;
+import java.util.TreeMap;
 
 class Statistics
 {
@@ -92,67 +93,81 @@ public class TransactionManager {
 	}
 	
 	
-	public void readTransactions(int max)
+	public void readTransactions()
 	{
-		this.MAX_THREADS=max;
+		TreeMap<String,List<String>> allOperations_new=new TreeMap<>();
 		try {
-			int threadcount=0;
-			ArrayList<ArrayList<String>> queue=new ArrayList<>();
-			ArrayList<String> listoperations=new ArrayList<>();
-			readerObj.readFromFile("TreeMap_test.txt");
-			int count=0;
-			Timestamp start_timestamp = new Timestamp(System.currentTimeMillis());
-			boolean flag=true;
-			int nothread=0;
-			while( queue.size()>0 || readerObj.getNext(listoperations).size()!=0)
-			{
-				if(listoperations.size()!=0)
-					queue.add(listoperations);
-				System.out.println("Pending sets="+queue.size());
-				System.out.println("***COUNT=: "+Thread.activeCount());
-				while(Thread.activeCount()>=MAX_THREADS)
-				{
-					if(flag && readerObj.getNext(listoperations).size()>0)
-						queue.add(listoperations);
-					else
-						flag=false;
-				}
-				if(Thread.activeCount()<MAX_THREADS && queue.size()>0)
-				{
-					count+=queue.get(0).size();
-					System.out.println("Threads created====>"+(++nothread));
-					System.out.println("Assigning work of size"+queue.get(0).size());
-					System.out.println("Executing :::::"+count);
-					TransactionExecuter transaction=new TransactionExecuter(queue.remove(0));
-					transaction.start();
-					threadcount++;
-				}
-				listoperations.clear();
-	        	
-			}
-
-			while (Thread.activeCount() > 1) {
-			}
-				Timestamp end_timestamp = new Timestamp(System.currentTimeMillis());
-				long milliseconds = end_timestamp.getTime() - start_timestamp.getTime();
-			    int seconds = (int) milliseconds / 1000;
-			    System.out.println("Number of transactions executed="+Statistics.counter+" time="+seconds+"for MPL="+MAX_THREADS);
-				System.out.println("Final exit!");
-				Statistics.MPL_list.add(MAX_THREADS);
-				Statistics.throughput.add((float)Statistics.counter/seconds);
-			
-			
-		} 
-		catch (FileNotFoundException e) {
-			// TODO Auto-generated catch  block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			FileInputStream fileIn = new FileInputStream("TreeMap.ser");
+			ObjectInputStream in = new ObjectInputStream(fileIn);
+			allOperations_new = (TreeMap<String, List<String>>) in.readObject();
+			in.close();
+			fileIn.close();
+		} catch (IOException i) {
+			i.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
+		}
+
+		System.out.println(allOperations_new);
+//
+//		this.MAX_THREADS=max;
+//		try {
+//			int threadcount=0;
+//			ArrayList<ArrayList<String>> queue=new ArrayList<>();
+//			ArrayList<String> listoperations=new ArrayList<>();
+//			readerObj.readFromFile("TreeMap_test.txt");
+//			int count=0;
+//			Timestamp start_timestamp = new Timestamp(System.currentTimeMillis());
+//			boolean flag=true;
+//			int nothread=0;
+//			while( queue.size()>0 || readerObj.getNext(listoperations).size()!=0)
+//			{
+//				if(listoperations.size()!=0)
+//					queue.add(listoperations);
+//				System.out.println("Pending sets="+queue.size());
+//				System.out.println("***COUNT=: "+Thread.activeCount());
+//				while(Thread.activeCount()>=MAX_THREADS)
+//				{
+//					if(flag && readerObj.getNext(listoperations).size()>0)
+//						queue.add(listoperations);
+//					else
+//						flag=false;
+//				}
+//				if(Thread.activeCount()<MAX_THREADS && queue.size()>0)
+//				{
+//					count+=queue.get(0).size();
+//					System.out.println("Threads created====>"+(++nothread));
+//					System.out.println("Assigning work of size"+queue.get(0).size());
+//					System.out.println("Executing :::::"+count);
+//					TransactionExecuter transaction=new TransactionExecuter(queue.remove(0));
+//					transaction.start();
+//					threadcount++;
+//				}
+//				listoperations.clear();
+//			}
+//
+//			while (Thread.activeCount() > 1) {
+//			}
+//				Timestamp end_timestamp = new Timestamp(System.currentTimeMillis());
+//				long milliseconds = end_timestamp.getTime() - start_timestamp.getTime();
+//			    int seconds = (int) milliseconds / 1000;
+//			    System.out.println("Number of transactions executed = "+Statistics.counter+" time = "+seconds+" for MPL = "+MAX_THREADS);
+//				System.out.println("Final exit!");
+//				Statistics.MPL_list.add(MAX_THREADS);
+//				Statistics.throughput.add((float)Statistics.counter/seconds);
+//
+//
+//		}
+//		catch (FileNotFoundException e) {
+//			// TODO Auto-generated catch  block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (ClassNotFoundException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	
 	}
 	
@@ -161,11 +176,11 @@ public class TransactionManager {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		TransactionManager manager=new TransactionManager();
-		for(int i=10;i<=100;i=i+10)
-			{
-				manager.readTransactions(i);
-				break;
-			}
+//		for(int i=10;i<=100;i=i+10)
+//			{
+				manager.readTransactions();
+//				break;
+//			}
 		
 //		for(int i=0;i<Statistics.MPL_list.size();i++)
 //		{

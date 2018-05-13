@@ -1,6 +1,7 @@
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeMap;
 
 public class ReaderWriter {
 	int BLOCKSIZE=100;
@@ -79,41 +80,21 @@ public class ReaderWriter {
 //
 //    }
 
-    public void readFromFile(String path) throws IOException, ClassNotFoundException {
+    public TreeMap<String, List<String>> readFromFile(String path) throws IOException, ClassNotFoundException {
 
-        FileInputStream fi = new FileInputStream(new File(path));
-        oi = new ObjectInputStream(fi);
-
-        List<Operation> listop=new ArrayList<Operation>();
-    	boolean cont = true;
-    	int count=0;
+        TreeMap<String,List<String>> allOperations_new=new TreeMap<>();
         try {
-        	while(cont)
-        	{
-	            Object opObject = oi.readObject();
-	            if (opObject != null) {
-	            	System.out.println(opObject);
-	            	Operation op=(Operation) opObject;
-	            	listop.add(op);
-	                count+=op.getOperationList().size();
-	            }
-	            else
-	            {
-	            	cont=false;
-	            }
-        	}
-        } 
-        catch(EOFException e)
-        {
-//        	e.printStackTrace();
-        }	
-        	catch (Exception e) {
-        
-            cont = false;
+            FileInputStream fileIn = new FileInputStream(path);
+            ObjectInputStream in = new ObjectInputStream(fileIn);
+            allOperations_new = (TreeMap<String, List<String>>) in.readObject();
+            in.close();
+            fileIn.close();
+        } catch (IOException i) {
+            i.printStackTrace();
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        System.out.println("Size=-====== "+count+" size of list= "+listop.size());
-//        return operations;
+        return  allOperations_new;
         
         
         
@@ -152,7 +133,7 @@ public class ReaderWriter {
         }
     }
 
-    public ArrayList getNext(ArrayList operations) {
+    public ArrayList<String> getNext(ArrayList<String> operations) {
     	
     	
 //    	operations.clear();
