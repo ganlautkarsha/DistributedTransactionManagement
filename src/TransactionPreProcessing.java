@@ -26,7 +26,6 @@ public class TransactionPreProcessing {
     }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
-//        Files.deleteIfExists(Paths.get("TreeMap_low_concurrency.ser"));
         TransactionPreProcessing transactionPreProcessing = new TransactionPreProcessing();
         transactionPreProcessing.processQueries();
 //        transactionPreProcessing.parseObservationOperationFile("./src/data/low_concurrency/observation_low_concurrency.sql");
@@ -45,19 +44,42 @@ public class TransactionPreProcessing {
     private void saveToFile() throws IOException {
         ReaderWriter writer = new ReaderWriter("writer");
 //        writer.writeToFile(this.allOperations);
-
+        int c=0;
+        int cnt=0;
         System.out.println("Size:"+this.allOperations.size());
-        try{
-            for(Map.Entry<String, List<String>> entry : this.allOperations.entrySet()) {
-                String key = entry.getKey();
-                writer.writeToFile(entry.getValue());
-            }
-            System.out.println("Done");
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
+        Timestamp prev=null;
+		ArrayList<String> opGroup=new ArrayList<>();
+		List<Operation> listop=new ArrayList<Operation>();
+		for(Map.Entry<String, List<String>> opEntry : this.allOperations.entrySet()) {
+		    String opKey = opEntry.getKey();
+		    cnt+=opEntry.getValue().size();
+		    Timestamp current=Timestamp.valueOf(opKey);
+		    System.out.println("Current="+current.toString());
+		    
+		    if(prev==null || current.getTime() - prev.getTime() <= 42000)
+		    {
+		    	if(prev!=null)
+		    		System.out.println("prev="+prev.getTime());
+		    	System.out.println("size of entry"+opEntry.getValue().size());
+		    	opGroup.addAll(opEntry.getValue());
+		    	System.out.println("Adding to group");
+		    }
+		    else
+		    {
+		    	System.out.println("prev="+prev.toString());
+		    	System.out.println("Group created");
+		    	Operation op=new Operation(Timestamp.valueOf(opKey), opGroup,StatementPriority.HIGH);
+		    	c+=opGroup.size();
+		    	opGroup.clear();
+		    	opGroup.addAll(opEntry.getValue());
+                listop.add(op);
+		    }
+		    prev=current;
+		}
+		System.out.println("size of listop"+listop.size());
+		writer.writeToFile(listop);
+		System.out.println("Done"+c);
+		System.out.println("Total="+cnt);
     }
 
 
@@ -146,8 +168,7 @@ public class TransactionPreProcessing {
 
 
     private String parseQueryOperationFile() throws IOException {
-        //Remove "-sql"
-        String pathname = "./src/queries/low_concurrency/queries-sql.txt";
+        String pathname = "./src/queries/low_concurrency/queries.txt";
         byte[] encoded = Files.readAllBytes(Paths.get(pathname));
         return new String(encoded);
     }
