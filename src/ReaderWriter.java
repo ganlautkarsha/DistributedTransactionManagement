@@ -3,10 +3,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReaderWriter {
-
+	int BLOCKSIZE=100;
+	int check_cnt=0;
     FileOutputStream fileOut;
     ObjectOutputStream out;
     ObjectInputStream oi;
+    List<String> queue=new ArrayList<>();
     ReaderWriter(String role)
     {
         try
@@ -38,12 +40,19 @@ public class ReaderWriter {
     }
 
 
-    public void writeToFile(List<String> operations) throws IOException {
+    public void writeToFile(List<Operation> operations)
+    {
         try {
 
-            for(Object ob:operations)
-                out.writeObject(ob);
+        	int c=0;
+        	out.writeObject(operations);
+//            for(Object ob:operations)
+//            {
+//            	c++;
+//                out.writeObject(ob);
+//            }
 
+            System.out.println("written-->"+c);
 //            System.out.printf("Serialized data is saved in TreeMap_low_concurrency.ser");
         } catch (IOException i) {
             i.printStackTrace();
@@ -75,6 +84,41 @@ public class ReaderWriter {
         FileInputStream fi = new FileInputStream(new File(path));
         oi = new ObjectInputStream(fi);
 
+        List<Operation> listop=new ArrayList<Operation>();
+    	boolean cont = true;
+    	int count=0;
+        try {
+        	while(cont)
+        	{
+	            Object opObject = oi.readObject();
+	            if (opObject != null) {
+	            	System.out.println(opObject);
+	            	Operation op=(Operation) opObject;
+	            	listop.add(op);
+	                count+=op.getOperationList().size();
+	            }
+	            else
+	            {
+	            	cont=false;
+	            }
+        	}
+        } 
+        catch(EOFException e)
+        {
+//        	e.printStackTrace();
+        }	
+        	catch (Exception e) {
+        
+            cont = false;
+            e.printStackTrace();
+        }
+        System.out.println("Size=-====== "+count+" size of list= "+listop.size());
+//        return operations;
+        
+        
+        
+        
+        
         //        ---- For reading TreeMap.ser ----
 
 //        TreeMap<String,List<String>> allOperations_new=new TreeMap<>();
@@ -93,24 +137,41 @@ public class ReaderWriter {
 
     }
 
+    public void triggerInput() throws ClassNotFoundException, IOException
+    {
+    	Object object = oi.readObject();
+        check_cnt++;
+        if (object != null) {
+        	Operation op=(Operation) object;
+//        	queue.add(op.getOperationList());
+        	
+//            operations.add(object);
+//            count++;
+        } else {
+//            break;
+        }
+    }
 
     public ArrayList getNext(ArrayList operations) {
-        boolean cont = true;
-        int count = 0;
-        try {
-            while (cont && count < 10) {
-                Object object = oi.readObject();
-                if (object != null) {
-                    operations.add(object);
-                    count++;
-                } else {
-                    cont = false;
-                }
-            }
-        } catch (Exception e) {
-            cont = false;
-
-        }
+    	
+    	
+//    	operations.clear();
+//        int count = 0;
+//        try {
+//            while (count < BLOCKSIZE) {
+//                Object object = oi.readObject();
+//                check_cnt++;
+//                if (object != null) {
+//                    operations.add(object);
+//                    count++;
+//                } else {
+//                    break;
+//                }
+//            }
+//        } catch (Exception e) {
+//
+//        }
+        System.out.println("Current check count="+check_cnt+"returning size="+operations.size());
         return operations;
     }
 
@@ -136,6 +197,6 @@ public class ReaderWriter {
 //        }
 //        System.out.println("Size=-======"+operations.size());
 //        return operations;
-
+//
 //    }
 }

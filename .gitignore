@@ -1,6 +1,5 @@
 .idea/*
 tau-operation-mgmt.iml
-data/*
 queries/*
 schema/*
 out
