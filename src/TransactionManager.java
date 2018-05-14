@@ -111,7 +111,7 @@ public class TransactionManager {
 //        }
         System.out.println("In getNext");
         if(threadQueue.size() != 0) {
-            System.out.println("Adding threadQueue element: " + threadQueue.get(0));
+//            System.out.println("Adding threadQueue element: " + threadQueue.get(0));
             operations = (ArrayList<String>) threadQueue.remove(0);
         }
         return operations;

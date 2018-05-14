@@ -13,7 +13,7 @@ public class ThreadPool
     static ThreadPoolExecutor executor;
     TransactionManager manager;
     public static boolean flag = true;
-    static int threadCount = 10;
+    static int threadCount = 5;
 
     public ThreadPool () {
 //        readerObj = new ReaderWriter("reader");
@@ -24,17 +24,9 @@ public class ThreadPool
         manager.readTransactions();
     }
 
-    private void statsCalculations(Timestamp startTime, Timestamp endTime, int numberOfTransactions) {
-        long milliseconds = endTime.getTime() - startTime.getTime();
-        int seconds = (int) milliseconds / 1000;
-        TDMAnalytics.MPL_list.add(this.threadCount);
-        float throughput = (float)numberOfTransactions/seconds;
-        TDMAnalytics.throughput.add(throughput);
-        System.out.println("Throughput: " + throughput + " MPL: " + threadCount);
-    }
-
     private void readTransactions() throws IOException, ClassNotFoundException, InterruptedException {
-        Timestamp start_timestamp = new Timestamp(System.currentTimeMillis());
+        long totalExecutionTime = 0;
+        Timestamp startExecutionTime = new Timestamp(System.currentTimeMillis());
 //        ArrayList<ArrayList<String>> queue = new ArrayList<>();
         ArrayList<String> listOfOperations = new ArrayList<>();
 
@@ -46,13 +38,14 @@ public class ThreadPool
                 System.out.println("Waiting");
                 Thread.sleep(12);
             }
+            System.out.println("Queue " + TransactionManager.threadQueue.size());
 //            System.out.print(count + ' ');
 //            System.out.println("Active Threads: " + executor.getActiveCount());
 //            System.out.println("listofOperations in readTransactions: " + listOfOperations.size());
             Task task = new Task(listOfOperations);
             executor.execute(task);
             count++;
-//            System.out.println("Active Threads: " + executor.getActiveCount());
+            System.out.println("Active Threads: " + executor.getActiveCount());
         }
         while((listOfOperations = manager.getNext()).size()>0) {
             Task task = new Task(listOfOperations);
@@ -60,9 +53,10 @@ public class ThreadPool
             count++;
         }
         System.out.println("*********************************************************************************");
-        Timestamp end_timestamp = new Timestamp(System.currentTimeMillis());
-        statsCalculations(start_timestamp, end_timestamp, count);
-        System.out.println(count);
+        Timestamp endExecutionTime = new Timestamp(System.currentTimeMillis());
+        totalExecutionTime = endExecutionTime.getTime() - startExecutionTime.getTime();
+        TDMAnalytics.totalExecutionTime += totalExecutionTime;
+        TDMAnalytics.totalTransactions += count;
 //        System.out.println("Maximum threads inside pool " + executor.getMaximumPoolSize());
     }
 
@@ -73,12 +67,12 @@ public class ThreadPool
         Timer timerObject = new Timer();
         timerObject.schedule(new OperationScheduler(timerObject), 0, 10);
         threadExecutor.readTransactions();
-//        System.out.println("Active Threads before shutdown: " + executor.getActiveCount());
         executor.shutdown();
         while (!executor.isTerminated()) {
         }
-//        System.out.println("Active Threads after shutdown: " + executor.getActiveCount());
         System.out.println("Finished all threads");
+        TDMAnalytics TDMAnalyticsCalculations = new TDMAnalytics(threadCount);
+        TDMAnalyticsCalculations.statsCalculations();
         System.exit(0);
     }
 }
