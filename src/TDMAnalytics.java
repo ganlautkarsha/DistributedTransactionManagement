@@ -1,15 +1,5 @@
-import java.util.ArrayList;
-
 public class TDMAnalytics {
     int threadCount = 0;
-
-    public TDMAnalytics(int threadCount) {
-        this.threadCount = threadCount;
-    }
-
-    public static int counter;
-    public static ArrayList<Integer> MPL_list=new ArrayList<>();
-    public static ArrayList<Float> throughput=new ArrayList<>();
 
     public static float totalResponseTimeforRead;
     public static int totalReads;
@@ -19,6 +9,12 @@ public class TDMAnalytics {
     public static int totalTransactions;
     public static final Object lock = new Object();
 
+//    ******** Constructor ********
+    public TDMAnalytics(int threadCount) {
+        this.threadCount = threadCount;
+    }
+
+//    ******** Analytics Calculations **********
     public void statsCalculations() {
 
 //        **************** Throughput Calculations ***********************
