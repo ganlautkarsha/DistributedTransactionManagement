@@ -1,10 +1,23 @@
+import java.util.Timer;
 import java.util.TimerTask;
 
 class OperationScheduler extends TimerTask {
-    int i = 0;
+    private int i = 0;
+    Timer timer = new Timer();
+
+    public OperationScheduler(Timer timerObject) {
+        System.out.println("OperationScheduler Constructor");
+        this.timer = timerObject;
+    }
 
     public void run() {
-        TransactionManager.threadQueue.add(TransactionManager.get);
-        System.out.println("Hello World");
+        if(i >= 5 || TransactionManager.operationMap.get(i) == null) {
+            this.timer.cancel();
+            ThreadPool.flag = false;
+            System.out.println("Timer Canceled");
+        }
+        TransactionManager.threadQueue.add(TransactionManager.operationMap.get(i));
+        System.out.println("Adding: " + i + ": " + TransactionManager.operationMap.get(i));
+        i++;
     }
 }
