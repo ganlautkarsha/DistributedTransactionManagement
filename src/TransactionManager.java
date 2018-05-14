@@ -120,7 +120,7 @@ public class TransactionManager {
 
     public void readTransactions() throws IOException, ClassNotFoundException {
         TreeMap<String, List<String>> allOperations_new = new TreeMap<>();
-        allOperations_new = readerObj.readFromFile("TreeMap.ser");
+        allOperations_new = readerObj.readFromFile("TreeMap_low_concurrency.ser");
         int count = 0;
         for (Map.Entry<String, List<String>> opEntry : allOperations_new.entrySet()) {
             count += opEntry.getValue().size();
@@ -145,7 +145,7 @@ public class TransactionManager {
                 first=false;
             }
             else{
-                if(current.getTime() - prev.getTime() <= 600000)
+                if(current.getTime() - prev.getTime() <= 179999)
                 {
                     opGroup.addAll(opEntry.getValue());
                 }

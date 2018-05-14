@@ -14,14 +14,11 @@ public class Task implements Runnable
         System.out.println("Size of listOfOperations in Constructor: " + this.listOfOperations.size());
     }
 
-    private void postgreSQLConnction () {
+    private void postgreSQLConnction (int isolationLevel, String url, String user, String password) {
         System.out.println("In PostgreSQLConnection");
-        String url = "jdbc:postgresql://localhost/tdm_multithreading_test";
-        String user = "tushar";
-        String password = "tush0906";
-
         try {
             connect = DriverManager.getConnection(url, user, password);
+            connect.setTransactionIsolation(isolationLevel);
             statement = connect.createStatement();
             connect.setAutoCommit(false);
             
@@ -64,7 +61,11 @@ public class Task implements Runnable
 
     @Override
     public void run() {
+        String url = "jdbc:postgresql://localhost/tdm_multithreading_test";
+        String user = "tushar";
+        String password = "tush0906";
+        int isolationLevel = Connection.TRANSACTION_READ_UNCOMMITTED;
         System.out.println("Running Thread");
-        postgreSQLConnction();
+        postgreSQLConnction(isolationLevel, url, user, password);
     }
 }

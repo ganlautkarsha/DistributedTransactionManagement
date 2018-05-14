@@ -32,7 +32,7 @@ public class ThreadPool
         while(flag) {
             while((listOfOperations = manager.getNext()).size()==0) {
                 System.out.println("Waiting");
-                Thread.sleep(102);
+                Thread.sleep(1002);
             }
 //            System.out.print(count + ' ');
             System.out.println("Active Threads: " + executor.getActiveCount());
@@ -60,7 +60,7 @@ public class ThreadPool
         ThreadPool threadExecutor = new ThreadPool();
         threadExecutor.populateMap();
         Timer timerObject = new Timer();
-        timerObject.schedule(new OperationScheduler(timerObject), 0, 100);
+        timerObject.schedule(new OperationScheduler(timerObject), 0, 1000);
         threadExecutor.readTransactions();
         System.out.println("Active Threads before shutdown: " + executor.getActiveCount());
         executor.shutdown();
