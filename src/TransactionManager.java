@@ -125,7 +125,7 @@ public class TransactionManager {
         for (Map.Entry<String, List<String>> opEntry : allOperations_new.entrySet()) {
             count += opEntry.getValue().size();
         }
-        System.out.println(count);
+//        System.out.println(count);
 
         Timestamp prev = null;
         boolean first=true;

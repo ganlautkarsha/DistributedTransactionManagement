@@ -15,7 +15,7 @@ public class Task implements Runnable
     }
 
     private void postgreSQLConnction (int isolationLevel, String url, String user, String password) {
-        System.out.println("In PostgreSQLConnection");
+//        System.out.println("In PostgreSQLConnection");
         try {
             connect = DriverManager.getConnection(url, user, password);
             connect.setTransactionIsolation(isolationLevel);
@@ -24,20 +24,20 @@ public class Task implements Runnable
             
 //          *****Executing*****
 //            String op: this.listOfOperations
-            System.out.println("listOfOperations = " + this.listOfOperations.size());
+//            System.out.println("listOfOperations = " + this.listOfOperations.size());
             for(int i = 0; i < listOfOperations.size(); i++) {
                 String op = listOfOperations.get(i);
                 String operation = op.replace("\n", "").trim();
                 if(operation.startsWith("SELECT"))
                 {
-                    System.out.println("SELECT Present");
+//                    System.out.println("SELECT Present");
                     resultSet = statement.executeQuery(operation);
                     if (resultSet.next()) {
-                        System.out.println("SQL Query Result:  " + resultSet.getString(1));
+//                        System.out.println("SQL Query Result:  " + resultSet.getString(1));
                     }
                 }
                 else {
-                    System.out.println("INSERT Present");
+//                    System.out.println("INSERT Present");
                     statement.executeUpdate(operation);
                 }
             }

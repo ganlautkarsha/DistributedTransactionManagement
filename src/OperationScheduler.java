@@ -17,7 +17,7 @@ class OperationScheduler extends TimerTask {
             System.out.println("Timer Canceled");
         }
         TransactionManager.threadQueue.add(TransactionManager.operationMap.get(i));
-        System.out.println("Adding: " + i + ": " + TransactionManager.operationMap.get(i));
+        System.out.println("Adding: " + i);
         i++;
     }
 }

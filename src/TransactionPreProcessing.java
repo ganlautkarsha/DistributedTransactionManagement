@@ -28,8 +28,8 @@ public class TransactionPreProcessing {
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         TransactionPreProcessing transactionPreProcessing = new TransactionPreProcessing();
         transactionPreProcessing.processQueries();
-        transactionPreProcessing.parseObservationOperationFile("./src/data/high_concurrency/observation_high_concurrency.sql");
-        transactionPreProcessing.parseObservationOperationFile("./src/data/high_concurrency/semantic_observation_high_concurrency.sql");
+        transactionPreProcessing.parseObservationOperationFile("./src/data/low_concurrency/observation_low_concurrency.sql");
+        transactionPreProcessing.parseObservationOperationFile("./src/data/low_concurrency/semantic_observation_low_concurrency.sql");
         transactionPreProcessing.saveToFile();
 
     }
@@ -43,7 +43,7 @@ public class TransactionPreProcessing {
 
     private void saveToFile() throws IOException {
         try {
-            FileOutputStream fileOut = new FileOutputStream("TreeMap_high_concurrency.ser");
+            FileOutputStream fileOut = new FileOutputStream("TreeMap_low_concurrency_mysql.ser");
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
             out.writeObject(allOperations);
             out.close();
@@ -138,9 +138,8 @@ public class TransactionPreProcessing {
         }
     }
 
-
     private String parseQueryOperationFile() throws IOException {
-        String pathname = "./src/queries/high_concurrency/queries.txt";
+        String pathname = "./src/queries/low_concurrency/queries-sql.txt";
         byte[] encoded = Files.readAllBytes(Paths.get(pathname));
         return new String(encoded);
     }
