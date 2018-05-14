@@ -77,7 +77,6 @@ class Demo extends TimerTask {
     }
 }
 public class TransactionManager {
-<<<<<<< HEAD
     ReaderWriter readerObj;
     public static List<List<String>> threadQueue = new ArrayList<>();
     int MAX_THREADS = 50;
@@ -173,55 +172,6 @@ public class TransactionManager {
 
 //        Timer t1 = new Timer();
 //        t1.schedule(new Demo(), 0,600);
-=======
-	ReaderWriter readerObj;
-	int MAX_THREADS=50;
-	
-	public TransactionManager() {
-		// TODO Auto-generated constructor stub
-		readerObj=new ReaderWriter("reader");
-	}
-	
-	
-	public void readTransactions(int max)
-	{
-		this.MAX_THREADS=max;
-		try {
-			int threadcount=0;
-			ArrayList<ArrayList<String>> queue=new ArrayList<>();
-			ArrayList<String> listoperations=new ArrayList<>();
-			readerObj.readFromFile("TreeMap_test.ser");
-			int count=0;
-			Timestamp start_timestamp = new Timestamp(System.currentTimeMillis());
-			boolean flag=true;
-			int nothread=0;
-			while( queue.size()>0 || readerObj.getNext(listoperations).size()!=0)
-			{
-				if(listoperations.size()!=0)
-					queue.add(listoperations);
-				System.out.println("Pending sets="+queue.size());
-				System.out.println("***COUNT=: "+Thread.activeCount());
-				while(Thread.activeCount()>=MAX_THREADS)
-				{
-					if(flag && readerObj.getNext(listoperations).size()>0)
-						queue.add(listoperations);
-					else
-						flag=false;
-				}
-				if(Thread.activeCount()<MAX_THREADS && queue.size()>0)
-				{
-					count+=queue.get(0).size();
-					System.out.println("Threads created====>"+(++nothread));
-					System.out.println("Assigning work of size"+queue.get(0).size());
-					System.out.println("Executing :::::"+count);
-					TransactionExecuter transaction=new TransactionExecuter(queue.remove(0));
-					transaction.start();
-					threadcount++;
-				}
-				listoperations.clear();
-	        	
-			}
->>>>>>> 12a1ff4659d0709d1d56f5726b3e495b1330819e
 
 		for(int i=10;i<=100;i=i+10)
 			{
