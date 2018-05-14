@@ -42,6 +42,7 @@ public class TransactionPreProcessing {
     }
 
     private void saveToFile() throws IOException {
+<<<<<<< HEAD
         try {
             FileOutputStream fileOut = new FileOutputStream("TreeMap_low_concurrency_mysql.ser");
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
@@ -52,6 +53,50 @@ public class TransactionPreProcessing {
         } catch (IOException i) {
             i.printStackTrace();
         }
+=======
+        ReaderWriter writer = new ReaderWriter("writer");
+//        writer.writeToFile(this.allOperations);
+        int c=0;
+        int cnt=0;
+        System.out.println("Size:"+this.allOperations.size());
+        Timestamp prev=null;
+		ArrayList<String> opGroup=new ArrayList<>();
+		List<Operation> listop=new ArrayList<Operation>();
+		for(Map.Entry<String, List<String>> opEntry : this.allOperations.entrySet()) {
+		    String opKey = opEntry.getKey();
+		    cnt+=opEntry.getValue().size();
+		    Timestamp current=Timestamp.valueOf(opKey);
+		    System.out.println("Current="+current.toString());
+		    
+		    if(prev==null || current.getTime() - prev.getTime() <= 42000)
+		    {
+		    	if(prev!=null)
+		    		System.out.println("prev="+prev.getTime());
+		    	System.out.println("size of entry"+opEntry.getValue().size());
+		    	opGroup.addAll(opEntry.getValue());
+		    	System.out.println("Adding to group");
+		    }
+		    else
+		    {
+		    	System.out.println("prev="+prev.toString());
+		    	System.out.println("Group created");
+//		    	Operation op=new Operation(Timestamp.valueOf(opKey), opGroup,StatementPriority.HIGH);
+		    	writer.writeToFile(opGroup);
+//		    	listop.add(op);
+		    	
+		    	c+=opGroup.size();
+		    	opGroup.clear();
+		    	opGroup.addAll(opEntry.getValue());
+                
+		    }
+		    prev=current;
+		}
+		System.out.println("size of listop"+listop.size());
+//		writer.writeToFile(listop);
+		System.out.println("Done"+c);
+		System.out.println("Total="+cnt);
+		writer.closeFile();
+>>>>>>> 12a1ff4659d0709d1d56f5726b3e495b1330819e
     }
 
 
@@ -118,7 +163,8 @@ public class TransactionPreProcessing {
             List<String> curlist=this.allOperations.getOrDefault(newOperation.getDate(), new ArrayList<String>());
             curlist.add(newOperation.getOperation());
             this.allOperations.put(newOperation.getDate(),curlist);
-            System.out.println(count);
+            System.out.println("-->"+count);
+            System.out.println("Allop size="+this.allOperations.size());
             count++;
         }
         Collections.sort(this.operations, Operation.GetComparator());
