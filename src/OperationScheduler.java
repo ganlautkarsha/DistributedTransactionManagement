@@ -11,7 +11,7 @@ class OperationScheduler extends TimerTask {
     }
 
     public void run() {
-        if(i == 50 || TransactionManager.operationMap.get(i) == null) {
+        if(i == 1000 || TransactionManager.operationMap.get(i) == null) {
             this.timer.cancel();
             ThreadPool.flag = false;
             System.out.println("Timer Canceled");
