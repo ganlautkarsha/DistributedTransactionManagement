@@ -145,7 +145,7 @@ public class TransactionPreProcessing {
 
     private Operation parseToOperation(String timestamp, String transactionQuery, SimpleDateFormat dateFormat) {
         Timestamp processedTimestamp = this.parseTime(timestamp, dateFormat);
-        Operation newOperation = new Operation(processedTimestamp, transactionQuery, StatementPriority.HIGH);
+        Operation newOperation = new Operation(processedTimestamp, transactionQuery);
         return newOperation;
     }
 

@@ -9,24 +9,21 @@ public class Operation implements Serializable {
     private Timestamp timeStamp;
     private ArrayList<String> operation;
     private String opr;
-    private StatementPriority operationPriority;
 
-    public Operation(Timestamp timeStamp, ArrayList<String> operation, StatementPriority operationPriority) {
+    public Operation(Timestamp timeStamp, ArrayList<String> operation) {
 
         this.timeStamp = timeStamp;
         this.operation = operation;
-        this.operationPriority = operationPriority;
     }
 
     public List<String> getOperationList() {
         return this.operation;
     }
 
-    public Operation(Timestamp timeStamp, String operation, StatementPriority operationPriority) {
+    public Operation(Timestamp timeStamp, String operation) {
 
         this.timeStamp = timeStamp;
         this.opr = operation;
-        this.operationPriority = operationPriority;
     }
 
     public String getDate() {
