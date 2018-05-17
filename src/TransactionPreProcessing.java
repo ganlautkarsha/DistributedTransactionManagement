@@ -14,21 +14,22 @@ public class TransactionPreProcessing {
     List operations;
     List obeservationOperations;            //contains obervation operations
     Map<String, List<Operation>> operationGroups;   //contains queries as a map (date, operations on that day)
-    TreeMap<String,List<String>> allOperations;
+    TreeMap<String, List<String>> allOperations;
 
     String outFile = "output.ser";
 
     public TransactionPreProcessing() {
         this.operations = new ArrayList<>();
         this.obeservationOperations = new ArrayList<>();
-        this.operationGroups = new HashMap<String, List<Operation>>();
-        this.allOperations=new TreeMap<>();
+        this.operationGroups = new HashMap<>();
+        this.allOperations = new TreeMap<>();
     }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         TransactionPreProcessing transactionPreProcessing = new TransactionPreProcessing();
         transactionPreProcessing.processQueries();
         transactionPreProcessing.parseObservationOperationFile("./src/data/low_concurrency/observation_low_concurrency.sql");
+
         transactionPreProcessing.parseObservationOperationFile("./src/data/low_concurrency/semantic_observation_low_concurrency.sql");
         transactionPreProcessing.saveToFile();
 
@@ -36,9 +37,6 @@ public class TransactionPreProcessing {
 
     private void processQueries() throws IOException {
         this.generateQueryOperations();
-//        this.groupTransactions();
-//        parses semantic observation
-//        writing to db logic here
     }
 
     private void saveToFile() throws IOException {
@@ -56,7 +54,6 @@ public class TransactionPreProcessing {
     }
 
 
-    //use same for semantic file
     private void parseObservationOperationFile(String op) throws IOException {
         String pathName = op;
         int count = 0;
@@ -69,7 +66,6 @@ public class TransactionPreProcessing {
                     count++;
                     if (count > 1000000) { //for blocks
                         count = 0;
-                        //writing to db logic here
                         this.obeservationOperations = new ArrayList<>();
                     }
                 } else {
@@ -82,6 +78,7 @@ public class TransactionPreProcessing {
     }
 
 
+    //for obervations
     private String parseObservations(String rawObservation) {
         String dateRegex = "[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}";
         Pattern timePattern = Pattern.compile(dateRegex);
@@ -90,11 +87,11 @@ public class TransactionPreProcessing {
         String date = matcher.group();
         SimpleDateFormat dateFormat = new SimpleDateFormat(
                 "yyyy-MM-dd HH:mm:ss", Locale.US);
-        Operation newOperation = parseToOperation(date, rawObservation, this.obeservationOperations, dateFormat);
+        Operation newOperation = parseToOperation(date, rawObservation, dateFormat);
         this.obeservationOperations.add(newOperation);
-        List<String> curlist=this.allOperations.getOrDefault(newOperation.getDate(), new ArrayList<>());
+        List<String> curlist = this.allOperations.getOrDefault(newOperation.getDate(), new ArrayList<>());
         curlist.add(newOperation.getOperation());
-        this.allOperations.put(newOperation.getDate(),curlist);
+        this.allOperations.put(newOperation.getDate(), curlist);
         return newOperation.getDate();
     }
 
@@ -108,36 +105,23 @@ public class TransactionPreProcessing {
         Matcher matcher = pattern.matcher(rawTransactions);
         SimpleDateFormat dateFormat = new SimpleDateFormat(
                 "yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
-        int count=0;
+        int count = 0;
         while (matcher.find()) {     // find the next match
             String rawTransaction = matcher.group();
             String[] splitTransaction = rawTransaction.split(",\"");
             String transaction = splitTransaction[1].substring(0, splitTransaction[1].length() - 1);
-            transaction = transaction.replace("\n"," ");
-            Operation newOperation = this.parseToOperation(splitTransaction[0], transaction, this.operations, dateFormat);
+            transaction = transaction.replace("\n", " ");
+            Operation newOperation = this.parseToOperation(splitTransaction[0], transaction, dateFormat);
             this.operations.add(newOperation);
-            List<String> curlist=this.allOperations.getOrDefault(newOperation.getDate(), new ArrayList<String>());
+            List<String> curlist = this.allOperations.getOrDefault(newOperation.getDate(), new ArrayList<String>());
             curlist.add(newOperation.getOperation());
-            this.allOperations.put(newOperation.getDate(),curlist);
+            this.allOperations.put(newOperation.getDate(), curlist);
             System.out.println(count);
             count++;
         }
         Collections.sort(this.operations, Operation.GetComparator());
     }
 
-
-    private void groupTransactions() {
-        for (Object t : this.operations) {
-            Operation operation = (Operation) t;
-            String txnDate = operation.getDate();
-            List currTxn = this.operationGroups.get(txnDate);
-            if (currTxn == null) {
-                currTxn = new ArrayList();
-            }
-            currTxn.add(operation);
-            operationGroups.put(txnDate, currTxn);
-        }
-    }
 
     private String parseQueryOperationFile() throws IOException {
         String pathname = "./src/queries/low_concurrency/queries_mysql.txt";
@@ -159,7 +143,7 @@ public class TransactionPreProcessing {
         return timestamp;
     }
 
-    private Operation parseToOperation(String timestamp, String transactionQuery, List operations, SimpleDateFormat dateFormat) {
+    private Operation parseToOperation(String timestamp, String transactionQuery, SimpleDateFormat dateFormat) {
         Timestamp processedTimestamp = this.parseTime(timestamp, dateFormat);
         Operation newOperation = new Operation(processedTimestamp, transactionQuery, StatementPriority.HIGH);
         return newOperation;

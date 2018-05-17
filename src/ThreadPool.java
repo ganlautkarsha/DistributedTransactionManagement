@@ -6,48 +6,40 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
 
-public class ThreadPool
-{
-//    ReaderWriter readerObj;
+public class ThreadPool {
+    //    ReaderWriter readerObj;
     int select_count = 0;
     static ThreadPoolExecutor executor;
     TransactionManager manager;
     public static boolean flag = true;
     static int threadCount = 5;
 
-    public ThreadPool () {
-//        readerObj = new ReaderWriter("reader");
+    public ThreadPool() {
         manager = new TransactionManager();
     }
 
-    private void populateMap () throws IOException, ClassNotFoundException {
+    private void populateMap() throws IOException, ClassNotFoundException {
         manager.readTransactions();
     }
 
     private void readTransactions() throws IOException, ClassNotFoundException, InterruptedException {
         long totalExecutionTime = 0;
         Timestamp startExecutionTime = new Timestamp(System.currentTimeMillis());
-//        ArrayList<ArrayList<String>> queue = new ArrayList<>();
         ArrayList<String> listOfOperations = new ArrayList<>();
 
-//        System.out.println("Operation Map: " + TransactionManager.operationMap.get(0));
-//        System.out.println("Thread Queue Size: " + TransactionManager.threadQueue.size());
-        int count=0;
-        while(flag) {
-            while((listOfOperations = manager.getNext()).size()==0) {
+        int count = 0;
+        while (flag) {
+            while ((listOfOperations = manager.getNext()).size() == 0) {
                 System.out.println("Waiting");
                 Thread.sleep(12);
             }
             System.out.println("Queue " + TransactionManager.threadQueue.size());
-//            System.out.print(count + ' ');
-//            System.out.println("Active Threads: " + executor.getActiveCount());
-//            System.out.println("listofOperations in readTransactions: " + listOfOperations.size());
             Task task = new Task(listOfOperations);
             executor.execute(task);
             count++;
             System.out.println("Active Threads: " + executor.getActiveCount());
         }
-        while((listOfOperations = manager.getNext()).size()>0) {
+        while ((listOfOperations = manager.getNext()).size() > 0) {
             Task task = new Task(listOfOperations);
             executor.execute(task);
             count++;
@@ -57,7 +49,6 @@ public class ThreadPool
         totalExecutionTime = endExecutionTime.getTime() - startExecutionTime.getTime();
         TDMAnalytics.totalExecutionTime += totalExecutionTime;
         TDMAnalytics.totalTransactions += count;
-//        System.out.println("Maximum threads inside pool " + executor.getMaximumPoolSize());
     }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
