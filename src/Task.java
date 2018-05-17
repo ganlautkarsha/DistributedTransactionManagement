@@ -14,8 +14,11 @@ public class Task implements Runnable
         System.out.println("Size of listOfOperations in Constructor: " + this.listOfOperations.size());
     }
 
-    private void postgreSQLConnction (int isolationLevel, String url, String user, String password) {
+    private void postgreSQLConnction (int isolationLevel, String url, String user, String password) throws SQLException {
 //        System.out.println("In PostgreSQLConnection");
+        long responseTime = 0;
+        int transactionReads = 0;
+        long workloadResponseTime = 0;
         try {
             connect = DriverManager.getConnection(url, user, password);
             connect.setTransactionIsolation(isolationLevel);
@@ -25,25 +28,40 @@ public class Task implements Runnable
 //          *****Executing*****
 //            String op: this.listOfOperations
 //            System.out.println("listOfOperations = " + this.listOfOperations.size());
+            Timestamp workloadStartTime = new Timestamp(System.currentTimeMillis());
             for(int i = 0; i < listOfOperations.size(); i++) {
                 String op = listOfOperations.get(i);
                 String operation = op.replace("\n", "").trim();
                 if(operation.startsWith("SELECT"))
                 {
 //                    System.out.println("SELECT Present");
+                    Timestamp start_timestamp = new Timestamp(System.currentTimeMillis());
                     resultSet = statement.executeQuery(operation);
-                    if (resultSet.next()) {
+                    Timestamp end_timestamp = new Timestamp(System.currentTimeMillis());
+                    responseTime += end_timestamp.getTime() - start_timestamp.getTime();
+                    transactionReads++;
+//                    if (resultSet.next()) {
 //                        System.out.println("SQL Query Result:  " + resultSet.getString(1));
-                    }
+//                    }
                 }
                 else {
 //                    System.out.println("INSERT Present");
                     statement.executeUpdate(operation);
                 }
             }
+            Timestamp workloadEndTime = new Timestamp(System.currentTimeMillis());
+            workloadResponseTime = workloadEndTime.getTime() - workloadStartTime.getTime();
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
+            connect.commit();
+            synchronized(TDMAnalytics.lock)
+            {
+                TDMAnalytics.totalResponseTimeforRead += responseTime;
+                TDMAnalytics.totalReads += transactionReads;
+                TDMAnalytics.totalWorkloadResponseTime += workloadResponseTime;
+                TDMAnalytics.totalWorkload += listOfOperations.size();
+            }
             close();
             System.out.println("Close Connection");
         }
@@ -66,6 +84,10 @@ public class Task implements Runnable
         String password = "tush0906";
         int isolationLevel = Connection.TRANSACTION_READ_UNCOMMITTED;
         System.out.println("Running Thread");
-        postgreSQLConnction(isolationLevel, url, user, password);
+        try {
+            postgreSQLConnction(isolationLevel, url, user, password);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
