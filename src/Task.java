@@ -17,41 +17,52 @@ public class Task implements Runnable {
         long responseTime = 0;
         int transactionReads = 0;
         long workloadResponseTime = 0;
-        try {
-            connect = DriverManager.getConnection(url, user, password);
-            connect.setTransactionIsolation(isolationLevel);
-            statement = connect.createStatement();
-            connect.setAutoCommit(false);
+        boolean retry;
+        do {
+            try {
+                connect = DriverManager.getConnection(url, user, password);
+                connect.setTransactionIsolation(isolationLevel);
+                statement = connect.createStatement();
+                connect.setAutoCommit(false);
 
-            Timestamp workloadStartTime = new Timestamp(System.currentTimeMillis());
-            for (int i = 0; i < listOfOperations.size(); i++) {
-                String op = listOfOperations.get(i);
-                String operation = op.replace("\n", "").trim();
-                if (operation.startsWith("SELECT")) {
-                    Timestamp start_timestamp = new Timestamp(System.currentTimeMillis());
-                    resultSet = statement.executeQuery(operation);
-                    Timestamp end_timestamp = new Timestamp(System.currentTimeMillis());
-                    responseTime += end_timestamp.getTime() - start_timestamp.getTime();
-                    transactionReads++;
-                } else {
-                    statement.executeUpdate(operation);
+                Timestamp workloadStartTime = new Timestamp(System.currentTimeMillis());
+                for (int i = 0; i < listOfOperations.size(); i++) {
+                    String op = listOfOperations.get(i);
+                    String operation = op.replace("\n", "").trim();
+                    if (operation.startsWith("SELECT")) {
+                        Timestamp start_timestamp = new Timestamp(System.currentTimeMillis());
+                        resultSet = statement.executeQuery(operation);
+                        Timestamp end_timestamp = new Timestamp(System.currentTimeMillis());
+                        responseTime += end_timestamp.getTime() - start_timestamp.getTime();
+                        transactionReads++;
+                    } else {
+                        statement.executeUpdate(operation);
+                    }
+                }
+                connect.commit();
+                close();
+                System.out.println("Close Connection");
+                Timestamp workloadEndTime = new Timestamp(System.currentTimeMillis());
+                workloadResponseTime = workloadEndTime.getTime() - workloadStartTime.getTime();
+                synchronized (TDMAnalytics.lock) {
+                    TDMAnalytics.totalResponseTimeforRead += responseTime;
+                    TDMAnalytics.totalReads += transactionReads;
+                    TDMAnalytics.totalWorkloadResponseTime += workloadResponseTime;
+                    TDMAnalytics.totalWorkload += listOfOperations.size();
+                }
+                retry = false;
+            } catch (SQLException e) {
+                final String ss = e.getSQLState();
+                if (ss.equals("40001") || ss.equals("40P01")) {
+                    System.out.println("************** Retrying ***************");
+                    retry = true;
+                }
+                else {
+                    e.printStackTrace();
+                    retry = false;
                 }
             }
-            Timestamp workloadEndTime = new Timestamp(System.currentTimeMillis());
-            workloadResponseTime = workloadEndTime.getTime() - workloadStartTime.getTime();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            connect.commit();
-            synchronized (TDMAnalytics.lock) {
-                TDMAnalytics.totalResponseTimeforRead += responseTime;
-                TDMAnalytics.totalReads += transactionReads;
-                TDMAnalytics.totalWorkloadResponseTime += workloadResponseTime;
-                TDMAnalytics.totalWorkload += listOfOperations.size();
-            }
-            close();
-            System.out.println("Close Connection");
-        }
+        } while(retry);
     }
 
     private void close() {
