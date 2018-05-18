@@ -24,11 +24,11 @@ public class PlotResults extends Application {
 //    private ArrayList<Double> workloadResponsePostgres;
 
     public PlotResults() {
-        this.mpl_postgres = new ArrayList<>(Arrays.asList(5, 10, 15, 20, 50, 80));
-        this.workloadResponsePostgres = new ArrayList<>(Arrays.asList(0.00043763, 0.00083076, 0.00128016, 0.00183008, 0.00614527, 0.00567767));
+        this.mpl_postgres = new ArrayList<>(Arrays.asList(5, 10, 20, 50, 80));
+        this.workloadResponsePostgres = new ArrayList<>(Arrays.asList(0.002603769, 0.008408237, 0.001122677, 0.001545799, 0.00796342));
 
-        this.mplMysql = new ArrayList<>(Arrays.asList(5, 10, 15, 20, 50, 80));
-        this.workloadResponseMysql = new ArrayList<>(Arrays.asList(0.00040968, 0.00073091, 0.00106861, 0.00133624, 0.00228753, 0.00192636));
+        this.mplMysql = new ArrayList<>(Arrays.asList(5, 10, 15, 50, 80));
+        this.workloadResponseMysql = new ArrayList<>(Arrays.asList(0.00173856, 0.00254902, 0.00378431, 0.00627451, 0.00718301));
     }
 
     @Override
@@ -36,15 +36,15 @@ public class PlotResults extends Application {
         // Replace this with actual values
     	ArrayList<String> isolation_levels = new ArrayList<>(Arrays.asList("TRANSACTION_READ_UNCOMMITTED","TRANSACTION_READ_COMMITTED","TRANSACTION_REPEATABLE_READ","TRANSACTION_SERIALIZABLE"));
         ArrayList<String> concurrency_levels = new ArrayList<>(Arrays.asList("LOW_CONCURRENCY", "HIGH_CONCURRENCY"));
-    	String isolation = isolation_levels.get(3);
+    	String isolation = isolation_levels.get(1);
     	String concurrency = concurrency_levels.get(1);
-        String title="Average Workload Response Time vs MPL for " + concurrency + " and " + isolation;
+        String title="Average Read Response Time vs MPL for " + concurrency + " and " + isolation;
 
         stage.setTitle(title);
         final NumberAxis xAxis = new NumberAxis();
         final NumberAxis yAxis = new NumberAxis();
         xAxis.setLabel("MPL");
-        yAxis.setLabel("Average Workload Response Time");
+        yAxis.setLabel("Average Read Response Time");
         final LineChart lineChart = new LineChart(xAxis, yAxis);
         lineChart.setAnimated(false);
         lineChart.setTitle(title);
