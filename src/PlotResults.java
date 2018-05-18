@@ -24,11 +24,11 @@ public class PlotResults extends Application {
 //    private ArrayList<Double> workloadResponsePostgres;
 
     public PlotResults() {
-        this.mpl_postgres = new ArrayList<>(Arrays.asList(5, 10, 20, 50, 80));
-        this.workloadResponsePostgres = new ArrayList<>(Arrays.asList(0.002603769, 0.008408237, 0.001122677, 0.001545799, 0.00796342));
+        this.mpl_postgres = new ArrayList<>(Arrays.asList(5, 10, 15, 20, 50, 80));
+        this.workloadResponsePostgres = new ArrayList<>(Arrays.asList(0.01335897, 0.01066667, 0.04818055, 0.07329167, 0.08545206, 0.27143243));
 
-        this.mplMysql = new ArrayList<>(Arrays.asList(5, 10, 15, 50, 80));
-        this.workloadResponseMysql = new ArrayList<>(Arrays.asList(0.00173856, 0.00254902, 0.00378431, 0.00627451, 0.00718301));
+        this.mplMysql = new ArrayList<>(Arrays.asList(5, 10, 15, 20, 50, 80));
+        this.workloadResponseMysql = new ArrayList<>(Arrays.asList(0.00373333, 0.03038621, 0.04478358, 0.08046032, 0.07039838, 0.08693220));
     }
 
     @Override
@@ -36,7 +36,7 @@ public class PlotResults extends Application {
         // Replace this with actual values
     	ArrayList<String> isolation_levels = new ArrayList<>(Arrays.asList("TRANSACTION_READ_UNCOMMITTED","TRANSACTION_READ_COMMITTED","TRANSACTION_REPEATABLE_READ","TRANSACTION_SERIALIZABLE"));
         ArrayList<String> concurrency_levels = new ArrayList<>(Arrays.asList("LOW_CONCURRENCY", "HIGH_CONCURRENCY"));
-    	String isolation = isolation_levels.get(1);
+    	String isolation = isolation_levels.get(3);
     	String concurrency = concurrency_levels.get(1);
         String title="Average Read Response Time vs MPL for " + concurrency + " and " + isolation;
 
