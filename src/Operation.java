@@ -9,45 +9,32 @@ public class Operation implements Serializable {
     private Timestamp timeStamp;
     private ArrayList<String> operation;
     private String opr;
-    private StatementPriority operationPriority;
 
-    public Operation(Timestamp timeStamp, ArrayList<String> operation, StatementPriority operationPriority) {
+    public Operation(Timestamp timeStamp, ArrayList<String> operation) {
 
         this.timeStamp = timeStamp;
         this.operation = operation;
-        this.operationPriority = operationPriority;
     }
-    public List<String> getOperationList()
-    {
-    	return this.operation;
+
+    public List<String> getOperationList() {
+        return this.operation;
     }
-    public Operation(Timestamp timeStamp, String operation, StatementPriority operationPriority) {
+
+    public Operation(Timestamp timeStamp, String operation) {
 
         this.timeStamp = timeStamp;
         this.opr = operation;
-        this.operationPriority = operationPriority;
     }
 
     public String getDate() {
-//        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-//        Date date = new Date(this.timeStamp.getTime());
-//        return dateFormat.format(date);
+
         return this.timeStamp.toString();
     }
 
-    public String getOperation()
-    {
+    public String getOperation() {
         return opr;
     }
 
-//    @Override
-//    public String toString() {
-//        return "Operation{" +
-//                "timeStamp=" + timeStamp +
-//                ", operation='" + operation + '\'' +
-//                ", operationPriority=" + operationPriority +
-//                '}';
-//    }
 
     public static Comparator<Operation> GetComparator() {
         return new Comparator<Operation>() {

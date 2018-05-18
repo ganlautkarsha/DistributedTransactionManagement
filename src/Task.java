@@ -1,21 +1,19 @@
 import java.sql.*;
 import java.util.ArrayList;
 
-public class Task implements Runnable
-{
+public class Task implements Runnable {
     private ArrayList<String> listOfOperations;
     private Connection connect = null;
     private Statement statement = null;
     private ResultSet resultSet = null;
-    
+
 
     public Task(ArrayList<String> listOfOperations) {
         this.listOfOperations = new ArrayList<>(listOfOperations);
         System.out.println("Size of listOfOperations in Constructor: " + this.listOfOperations.size());
     }
 
-    private void postgreSQLConnction (int isolationLevel, String url, String user, String password) throws SQLException {
-//        System.out.println("In PostgreSQLConnection");
+    private void dbConnection(int isolationLevel, String url, String user, String password) throws SQLException {
         long responseTime = 0;
         int transactionReads = 0;
         long workloadResponseTime = 0;
@@ -24,28 +22,18 @@ public class Task implements Runnable
             connect.setTransactionIsolation(isolationLevel);
             statement = connect.createStatement();
             connect.setAutoCommit(false);
-            
-//          *****Executing*****
-//            String op: this.listOfOperations
-//            System.out.println("listOfOperations = " + this.listOfOperations.size());
+
             Timestamp workloadStartTime = new Timestamp(System.currentTimeMillis());
-            for(int i = 0; i < listOfOperations.size(); i++) {
+            for (int i = 0; i < listOfOperations.size(); i++) {
                 String op = listOfOperations.get(i);
                 String operation = op.replace("\n", "").trim();
-                if(operation.startsWith("SELECT"))
-                {
-//                    System.out.println("SELECT Present");
+                if (operation.startsWith("SELECT")) {
                     Timestamp start_timestamp = new Timestamp(System.currentTimeMillis());
                     resultSet = statement.executeQuery(operation);
                     Timestamp end_timestamp = new Timestamp(System.currentTimeMillis());
                     responseTime += end_timestamp.getTime() - start_timestamp.getTime();
                     transactionReads++;
-//                    if (resultSet.next()) {
-//                        System.out.println("SQL Query Result:  " + resultSet.getString(1));
-//                    }
-                }
-                else {
-//                    System.out.println("INSERT Present");
+                } else {
                     statement.executeUpdate(operation);
                 }
             }
@@ -55,8 +43,7 @@ public class Task implements Runnable
             e.printStackTrace();
         } finally {
             connect.commit();
-            synchronized(TDMAnalytics.lock)
-            {
+            synchronized (TDMAnalytics.lock) {
                 TDMAnalytics.totalResponseTimeforRead += responseTime;
                 TDMAnalytics.totalReads += transactionReads;
                 TDMAnalytics.totalWorkloadResponseTime += workloadResponseTime;
@@ -69,7 +56,7 @@ public class Task implements Runnable
 
     private void close() {
         try {
-            if(resultSet != null) resultSet.close();
+            if (resultSet != null) resultSet.close();
             if (statement != null) statement.close();
             if (connect != null) connect.close();
         } catch (Exception e) {
@@ -85,7 +72,7 @@ public class Task implements Runnable
         int isolationLevel = Connection.TRANSACTION_READ_UNCOMMITTED;
         System.out.println("Running Thread");
         try {
-            postgreSQLConnction(isolationLevel, url, user, password);
+            dbConnection(isolationLevel, url, user, password);
         } catch (SQLException e) {
             e.printStackTrace();
         }
