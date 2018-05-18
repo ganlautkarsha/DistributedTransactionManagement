@@ -37,7 +37,7 @@ public class PlotResults extends Application {
     	ArrayList<String> isolation_levels = new ArrayList<>(Arrays.asList("TRANSACTION_READ_UNCOMMITTED","TRANSACTION_READ_COMMITTED","TRANSACTION_REPEATABLE_READ","TRANSACTION_SERIALIZABLE"));
         ArrayList<String> concurrency_levels = new ArrayList<>(Arrays.asList("LOW_CONCURRENCY", "HIGH_CONCURRENCY"));
     	String isolation = isolation_levels.get(3);
-    	String concurrency = concurrency_levels.get(0);
+    	String concurrency = concurrency_levels.get(1);
         String title="Average Workload Response Time vs MPL for " + concurrency + " and " + isolation;
 
         stage.setTitle(title);
@@ -62,7 +62,7 @@ public class PlotResults extends Application {
                     series2.getData().add(new XYChart.Data(this.mpl_postgres.get(i),this.workloadResponsePostgres.get(i)));}
 
                 
-            Scene scene = new Scene(lineChart, 800, 600);
+            Scene scene = new Scene(lineChart, 1600, 1200);
             lineChart.getData().addAll(series1);
             lineChart.getData().addAll(series2);
             
