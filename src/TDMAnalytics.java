@@ -7,6 +7,7 @@ public class TDMAnalytics {
     public static int totalWorkload;
     public static float totalExecutionTime;
     public static int totalTransactions;
+    public static int totalRows;
     public static final Object lock = new Object();
 
 //    ******** Constructor ********
@@ -32,6 +33,12 @@ public class TDMAnalytics {
         averageWorkloadResponseTime = totalWorkloadResponseTime / (totalWorkload * 1000);
         String averageWorkloadResponseTimeinString = String.format("%.8f", averageWorkloadResponseTime);
         System.out.println("Average Workload Response Time: " + averageWorkloadResponseTimeinString);
+
+//        **************** Average Workload Response Time Calculations ***********************
+        float averageRows;
+        averageRows = totalRows / totalReads;
+        String averageRowsinString = String.format("%.8f", averageRows);
+        System.out.println("Average Rows Returned: " + averageRowsinString);
 
     }
 }

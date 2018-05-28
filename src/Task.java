@@ -17,6 +17,7 @@ public class Task implements Runnable {
         long responseTime = 0;
         int transactionReads = 0;
         long workloadResponseTime = 0;
+        int size = 0;
         boolean retry;
         do {
             try {
@@ -32,6 +33,12 @@ public class Task implements Runnable {
                     if (operation.startsWith("SELECT")) {
                         Timestamp start_timestamp = new Timestamp(System.currentTimeMillis());
                         resultSet = statement.executeQuery(operation);
+                        if (resultSet != null)
+                        {
+                            resultSet.beforeFirst();
+                            resultSet.last();
+                            size = resultSet.getRow();
+                        }
                         Timestamp end_timestamp = new Timestamp(System.currentTimeMillis());
                         responseTime += end_timestamp.getTime() - start_timestamp.getTime();
                         transactionReads++;
@@ -49,6 +56,7 @@ public class Task implements Runnable {
                     TDMAnalytics.totalReads += transactionReads;
                     TDMAnalytics.totalWorkloadResponseTime += workloadResponseTime;
                     TDMAnalytics.totalWorkload += listOfOperations.size();
+                    TDMAnalytics.totalRows += size;
                 }
                 retry = false;
             } catch (SQLException e) {
@@ -77,8 +85,8 @@ public class Task implements Runnable {
 
     @Override
     public void run() {
-        String url = "jdbc:postgresql://localhost/tdm_multithreading_test";
-        String user = "tushar";
+        String url = "jdbc:postgresql://localhost/tdm";
+        String user = "tkulrepl";
         String password = "tush0906";
         int isolationLevel = Connection.TRANSACTION_READ_UNCOMMITTED;
         System.out.println("Running Thread");
